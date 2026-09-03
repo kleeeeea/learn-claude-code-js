@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="s01 agent loop (tsx)" type="NodeJSConfigurationType"
+                 application-parameters=""
+                 path-to-js-file="s01_agent_loop/main.ts"
+                 working-dir="$PROJECT_DIR$"
+                 node-parameters="--import tsx --env-file-if-exists=.env">
+    <method v="2" />
+  </configuration>
+</component>
