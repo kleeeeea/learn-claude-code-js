@@ -63,19 +63,37 @@ else
 	OPENCODE=(opencode)
 fi
 
-# ── 2. credential -> opencode.json ─────────────────
-# credential 是一条能直接跑的 curl 示例：LLM_API_KEY=... 加 ark 的 URL 和 model 名。
-if [ ! -f "$CREDENTIAL_FILE" ]; then
-	echo "[opencode] 找不到 credential：$CREDENTIAL_FILE" >&2
-	echo "[opencode] 没有它就只能自己 opencode auth login，直接起 opencode。" >&2
-else
+# ── 2. credential / .env -> opencode.json ──────────
+# 两种来源都认：
+#   credential —— 一条能直接跑的 curl 示例（LLM_API_KEY=... 加 ark 的 URL 和 model 名）
+#   .env       —— 仓库跑各章用的那份（ANTHROPIC_API_KEY / ANTHROPIC_BASE_URL / MODEL_ID）
+# credential 优先；它不在（比如为了推 GitHub 已经删掉）就退回 .env。
+ENV_FILE="${OPENCODE_ENV_FILE:-$REPO_DIR/.env}"
+API_KEY=""; BASE_URL=""; MODEL_ID=""; CRED_SOURCE=""
+env_get() { grep -Eo "^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=[[:space:]]*\"?[^\"[:space:]]+" "$ENV_FILE" | head -1 | sed -E 's/^.*=[[:space:]]*"?//'; }
+
+if [ -f "$CREDENTIAL_FILE" ]; then
+	CRED_SOURCE="$CREDENTIAL_FILE"
 	API_KEY="$(grep -Eo '^[[:space:]]*(export[[:space:]]+)?(LLM_API_KEY|ANTHROPIC_API_KEY)[[:space:]]*=[[:space:]]*"?[^"[:space:]]+' "$CREDENTIAL_FILE" | head -1 | sed -E 's/^.*=[[:space:]]*"?//')"
 	# baseURL 要指到 /v1（SDK 自己拼 /chat/completions），跟 Anthropic SDK「不带 /v1」相反
 	BASE_URL="$(grep -o 'https\{0,1\}://[^[:space:]"'"'"'\\]*' "$CREDENTIAL_FILE" | head -1 | sed -e 's#/messages/\{0,1\}$##' -e 's#/*$##')"
 	MODEL_ID="$(sed -n 's/.*"model"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$CREDENTIAL_FILE" | head -1)"
+elif [ -f "$ENV_FILE" ]; then
+	CRED_SOURCE="$ENV_FILE"
+	API_KEY="$(env_get '(LLM_API_KEY|ANTHROPIC_API_KEY)')"
+	BASE_URL="$(env_get 'ANTHROPIC_BASE_URL' | sed -e 's#/messages/\{0,1\}$##' -e 's#/*$##')"
+	MODEL_ID="$(env_get 'MODEL_ID')"
+	# .env 里那个是给 Anthropic SDK 用的、不带 /v1；这里要 OpenAI 那套端点，缺了就补上
+	case "$BASE_URL" in */v[0-9]|*/v[0-9][0-9]) ;; *) [ -n "$BASE_URL" ] && BASE_URL="$BASE_URL/v1";; esac
+else
+	echo "[opencode] 既没有 $CREDENTIAL_FILE 也没有 $ENV_FILE" >&2
+	echo "[opencode] 只能自己 opencode auth login，直接起 opencode。" >&2
+fi
 
+if [ -n "$CRED_SOURCE" ]; then
+	echo "[opencode] 配置来源：$CRED_SOURCE"
 	if [ -z "$API_KEY" ] || [ -z "$BASE_URL" ] || [ -z "$MODEL_ID" ]; then
-		echo "[opencode] credential 解析不全（key/baseUrl/model 缺一），不动 opencode.json" >&2
+		echo "[opencode] $CRED_SOURCE 解析不全（key/baseUrl/model 缺一），不动 opencode.json" >&2
 	else
 		# 合并而不是覆盖：只增改本 provider 和 model 这两项，别人的键留着。
 		PROVIDER_NAME="$PROVIDER_NAME" BASE_URL="$BASE_URL" MODEL_ID="$MODEL_ID" \
