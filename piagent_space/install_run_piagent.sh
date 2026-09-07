@@ -34,6 +34,9 @@ SESSION_DIR="${PIAGENT_SESSION_DIR:-$SCRIPT_DIR/sessions}"
 # models.json 里只放这个变量名，真实 key 由本脚本在运行时 export
 API_KEY_ENV="PIAGENT_API_KEY"
 PYTHON="${PIAGENT_PYTHON:-/Users/l/miniconda3/envs/base124/bin/python}"
+# 单次回复的输出上限。glm-5.3 这类会先写一大段 thinking，8000 太小：思考写满就
+# stopReason=length，正文一个字都没输出（表现为「跑完没有任何回答」）。
+MAX_TOKENS="${PIAGENT_MAX_TOKENS:-32000}"
 
 # pi 的绝对路径：nvm 切了 node 版本后 pi 装在哪个版本下就只在哪个版本的 bin 里，
 # 当前 PATH 上不一定有；zsh 里 `pi` 还可能是别的同名函数。所以自己找一遍。
@@ -98,7 +101,7 @@ if [ -n "$CRED_SOURCE" ]; then
 		mkdir -p "$PI_CONFIG_DIR"
 		# 合并而不是覆盖：只增改 $PROVIDER_NAME 这一个 key，别人的 provider 留着。
 		PROVIDER_NAME="$PROVIDER_NAME" BASE_URL="$BASE_URL" MODEL_ID="$MODEL_ID" \
-		API_KEY_ENV="$API_KEY_ENV" MODELS_JSON="$MODELS_JSON" \
+		API_KEY_ENV="$API_KEY_ENV" MODELS_JSON="$MODELS_JSON" MAX_TOKENS="$MAX_TOKENS" \
 		SETTINGS_JSON="$SETTINGS_JSON" SESSION_DIR="$SESSION_DIR" "$PYTHON" - <<'PY'
 import json, os, pathlib
 
@@ -125,7 +128,7 @@ providers[os.environ["PROVIDER_NAME"]] = {
 			"reasoning": True,
 			"input": ["text"],
 			"contextWindow": 200000,
-			"maxTokens": 8000,
+			"maxTokens": int(os.environ["MAX_TOKENS"]),
 		}
 	],
 }
