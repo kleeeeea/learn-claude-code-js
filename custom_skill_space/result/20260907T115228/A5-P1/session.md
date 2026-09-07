@@ -1,0 +1,967 @@
+# session history
+
+来源：`2026-09-07T04-15-16-385Z_01a07a13-d9a1-77d6-927d-1e62dca7a652.jsonl`
+
+## user  <sub>2026-09-07T04:15:16.453Z</sub>
+
+为课标 7.EE.4 命 3 道题：一道直接应用、一道情境应用、一道容易暴露常见误解。每题给出题干、参考答案、评分要点（哪一步给分），并逐题说明它测的是原文里的哪个动词/短语。先给出该编号的原文和页码。
+
+## assistant  <sub>2026-09-07T04:15:18.338Z</sub>
+
+<details><summary>thinking</summary>
+
+```
+The user wants me to create 3 assessment items for standard 7.EE.4. First, I need to look up the standard text. There's a skill available: math-standards. Let me read the skill file first to understand how to query the standards.
+```
+
+</details>
+
+🔧 `read({"path": "/Users/l/other_git_repos/calculus-quest/nodejs_react_lib/learn-claude-code/custom_skill_space/math-standards/SKILL.md"})`
+
+## toolResult · read  <sub>2026-09-07T04:15:18.343Z</sub>
+
+```
+---
+name: math-standards
+description: 查询美国 Common Core 数学课程标准（K-8 与高中五个概念类别，共 385 条）。按课标编号（如 K.CC.4、8.G.7、S-MD.5）、年级或领域查出课标要求原文、所属领域/知识点与 PDF 页码。需要核对某条课标怎么说、某年级某领域包含哪些要求、或把教学内容对齐到课标编号时使用。
+---
+
+# Common Core 数学课标查询
+
+数据来自 `数学课标整理表格.xlsx`，已整理成两个文件：
+
+- `references/index.md` —— 年级 × 领域的总览表（条数、编号示例）。先看它定位范围。
+- `references/standards.csv` —— 全量 385 条，列为
+  `code, grade, domain, cluster, requirement, pdf_page`。
+
+年级取值：K, 1, 2, 3, 4, 5, 6, 7, 8, High School — Number and Quantity, High School — Algebra, High School — Functions, High School — Geometry, High School — Statistics and Probability。
+
+## 怎么查
+
+编号已知时直接按编号取行（编号在第一列，行首匹配最准）：
+
+```bash
+grep -m1 '^8.G.7,' references/standards.csv
+```
+
+按年级或领域筛选，只看编号和要求两列：
+
+```bash
+awk -F',' '$2=="5"' references/standards.csv | cut -d',' -f1,5
+grep ',Geometry,' references/standards.csv | cut -d',' -f1,5
+```
+
+按关键词找（例如勾股定理相关）：
+
+```bash
+grep -i 'pythagorean' references/standards.csv | cut -d',' -f1,2,5
+```
+
+`requirement` 字段里含逗号，所以取整行文本时用 `grep` 原样输出，别用 `cut` 切到第 5 列以后。
+
+## 回答约定
+
+- 引用课标要求时给出**原文**（英文）加编号，必要时再翻译。
+- 一并给出 `grade` / `domain` 和 `pdf_page`，方便回到 PDF 核对。
+- 表里没有的条目直说没有，不要照编号规律臆造。
+
+```
+
+## assistant  <sub>2026-09-07T04:15:20.375Z</sub>
+
+<details><summary>thinking</summary>
+
+```
+Let me query the standard 7.EE.4 from the CSV file.
+```
+
+</details>
+
+🔧 `bash({"command": "grep -m1 '^7.EE.4,' /Users/l/other_git_repos/calculus-quest/nodejs_react_lib/learn-claude-code/custom_skill_space/math-standards/references/standards.csv"})`
+
+## toolResult · bash  <sub>2026-09-07T04:15:20.403Z</sub>
+
+```
+7.EE.4,7,Expressions and Equations,Solve real-life and mathematical problems using numerical and algebraic expressions and equations.,"4. Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities. a. Solve word problems leading to equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers. Solve equations of these forms fluently. Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach. b. Solve word problems leading to inequalities of the form px + q > r or px + q < r, where p, q, and r are specific rational numbers. Graph the solution set of the inequality and interpret it in the context of the problem.",P49
+
+```
+
+## assistant  <sub>2026-09-07T04:20:23.168Z</sub>
+
+<details><summary>thinking</summary>
+
+```
+I got the full text of 7.EE.4. Let me note the details:
+
+- Code: 7.EE.4
+- Grade: 7
+- Domain: Expressions and Equations
+- Cluster: Solve real-life and mathematical problems using numerical and algebraic expressions and equations.
+- Requirement: "4. Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities. a. Solve word problems leading to equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers. Solve equations of these forms fluently. Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach. b. Solve word problems leading to inequalities of the form px + q > r or px + q < r, where p, q, and r are specific rational numbers. Graph the solution set of the inequality and interpret it in the context of the problem."
+- PDF page: P49
+
+Now I need to create 3 items:
+1. One direct application (直接应用) — likely solving px + q = r or p(x + q) = r fluently
+2. One contextual application (情境应用) — word problem leading to equation/inequality, with graphing solution set for inequality
+3. One that exposes common misconceptions (容易暴露常见误解) — e.g., the classic misconception when solving inequalities: forgetting to flip the sign when dividing by a negative number; or misinterpreting the direction of the inequality in context; or the "reversing the variable" issue; or comparing algebraic vs arithmetic solutions.
+
+Key verbs/phrases in the standard:
+- "Use variables to represent quantities in a real-world or mathematical problem"
+- "construct simple equations and inequalities to solve problems by reasoning about the quantities"
+- a. "Solve word problems leading to equations of the form px + q = r and p(x + q) = r"
+- "Solve equations of these forms fluently"
+- "Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach"
+- b. "Solve word problems leading to inequalities of the form px + q > r or px + q < r"
+- "Graph the solution set of the inequality"
+- "interpret it in the context of the problem"
+
+Let me design the 3 items:
+
+**Item 1: Direct application (直接应用)**
+Direct solving of equations of form px + q = r and p(x + q) = r with rational numbers, fluently. Maybe two-part: solve 3x + 5 = -7 and (1/2)(x - 4) = 9? Actually p(x+q) = r form. Let me use rational numbers: p, q, r specific rational numbers.
+
+E.g., Part A: 4x − 7 = 13... wait, maybe use fractions to hit "specific rational numbers": 
+- A: 3x + 5 = -16 → 3x = -21 → x = -7
+- B: (1/2)(x − 6) = 10 → x − 6 = 20 → x = 26
+
+Or one of each form. The scoring: 
+- Correct inverse operation sequence (subtract 5 from both sides / divide by 3)
+- Correct arithmetic with rationals
+- Both done fluently
+
+This tests: "Solve equations of these forms fluently" and "equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers."
+
+Maybe I should make it a single equation set with two equations. Also could ask to check solution by substitution. Scoring points: setting up inverse operations, correct handling of rational numbers, final answer.
+
+Let me make the numbers a bit more rational-heavy: 
+- A: -2x + 9 = 15 → -2x = 6 → x = -3
+- B: (x + 3)/4 = 5 — that's (1/4)(x+3) = 5, i.e., p = 1/4, q = 3, r = 5 → x + 3 = 20 → x = 17
+
+Hmm, or B: 0.5(x + 8) = -6 → x + 8 = -12 → x = -20. That uses a decimal rational.
+
+Scoring for item 1:
+1. Applying the correct first inverse operation to isolate the variable term (e.g., subtracting/dividing appropriately, distributing or dividing both sides by p) — 1 pt
+2. Correct arithmetic with rational numbers (signs, fractions/decimals) — 1 pt
+3. Final solution stated — 1 pt
+Maybe also "check" step optional.
+
+**Item 2: Contextual application (情境应用)**
+A word problem leading to an inequality of form px + q > r (or < r), where students must use a variable, construct the inequality, solve, graph the solution set, and interpret in context.
+
+Classic: gym membership, phone plan, saving money. E.g.:
+
+"Jada has a phone plan that costs $24 per month plus $0.10 per text message... " Hmm, or something like:
+
+"A gym charges a $25 sign-up fee plus $15 per month. Kira has at most $160 to spend. How many full months can she pay for?" Hmm, that leads to 15m + 25 ≤ 160 → 15m ≤ 135 → m ≤ 9. Graph on number line, interpret: at most 9 months.
+
+Or a "more than" scenario: "Lin wants to buy a $60 jacket... has $18 and saves $7.50 per week from allowance. How many weeks until she can afford it?" 7.5w + 18 ≥ 60 → 7.5w ≥ 42 → w ≥ 5.6 → she needs 6 full weeks (interpretation step! w ≥ 5.6, but in context whole weeks, so at least 6 weeks). That's a nice interpretation with rounding — good for "interpret it in the context of the problem."
+
+Actually let me make it cleaner but keep the interpretation meaningful. Using rational number p = 7.5 hits "specific rational numbers."
+
+Item 2: "Lin is saving for a bicycle that costs $135. She already has $24 saved, and she saves $7.50 per week from walking dogs. a) Write an inequality that can be used to find w, the number of weeks... b) Solve the inequality. c) Graph the solution set on a number line. d) What does the solution mean in context — after how many whole weeks can Lin buy the bicycle?"
+
+7.5w + 24 ≥ 135 → 7.5w ≥ 111 → w ≥ 14.8. So after 15 whole weeks. Hmm, 111/7.5 = 14.8. Good.
+
+Scoring:
+1. Defining the variable and writing the correct inequality (use variables to represent quantities... construct simple inequalities... by reasoning about quantities) — 1 pt
+2. Correct algebraic solution (subtract 24, divide by 7.5, correct direction of inequality) — 1 pt
+3. Correct graph on number line (closed/open circle at 14.8, shading right) — 1 pt
+4. Contextual interpretation: whole number of weeks, at least 15 weeks — 1 pt
+
+This item tests: "Use variables to represent quantities in a real-world... problem, and construct simple... inequalities" (from the main statement), "Solve word problems leading to inequalities of the form px + q > r" (b), "Graph the solution set of the inequality and interpret it in the context of the problem" (b).
+
+Note: ≥ vs > — the standard says px + q > r or px + q < r, but ≥ is generally accepted in the same family. To be safe I could phrase as "at least" (≥). Hmm, the standard strictly says ">" or "<". Many textbook items use ≥/≤. I could phrase the problem so that strict > works: "needs more than" — but then buying a bike needs ≥. Let me think: "wants to have more than $135"? Hmm.
+
+Actually, to align strictly with px + q > r, I can design: "Lin wants her savings to be more than $135 before she buys the bike" — a bit unnatural. Alternatively use "at least" and note that the item addresses the px + q ≥ r extension of the same reasoning; or just phrase with strict inequality naturally: "The elevator can hold at most..." → ≤. Natural contexts often give ≥/≤. 
+
+I think it's fine to use ≥ and note it tests the b strand (px + q > r family; the reasoning extends to ≥). Or to be strict, use ">" context: "A taxi charges $3.50 plus $2.75 per mile. Tyler has $25. How many miles can he ride and still keep more than... " hmm no.
+
+Let me do a strict inequality with natural context: "A storage company charges a $20 rental fee plus $12.50 per day..." Hmm.
+
+Natural ">" context: "To qualify for the reading contest, students must read more than 800 pages..." No wait, that's a different form.
+
+How about: "Kiran's goal is to raise more than $500 for charity. He has raised $165 so far, and each participant donates $17..." Hmm, 17w + 165 > 500 → 17w > 335 → w > 19.7... → at least 20 participants. That's p = 17, q = 165, r = 500. All integers though. Let me use rational: each participant donates $12.50: 12.5w + 165 > 500 → 12.5w > 335 → w > 26.8. So he needs at least 27 participants. Interpretation: strict inequality, whole people, so minimum 27. 
+
+That's nice: it naturally uses > (goal: "more than $500"), and the interpretation requires reasoning that w must be a whole number strictly greater than 26.8, so 27.
+
+Let me finalize Item 2: 
+"Kiran is fundraising for a charity walk. His goal is to raise more than $500. So far he has raised $165. Each additional sponsor donates $12.50.
+a) Use a variable to represent the number of additional sponsors, and write an inequality to find how many sponsors Kiran needs to reach his goal.
+b) Solve the inequality.
+c) Graph the solution set on a number line.
+d) Interpret your solution: what is the minimum number of additional sponsors Kiran needs?"
+
+Answers: 12.5s + 165 > 500 → 12.5s > 335 → s > 26.8 → graph open circle at 26.8, shade right → minimum 27 sponsors.
+
+Scoring points:
+1. Variable defined + correct inequality constructed (reasoning about quantities): 12.5s + 165 > 500 — tests "Use variables to represent quantities in a real-world... problem, and construct simple... inequalities to solve problems by reasoning about the quantities"
+2. Solution steps: subtract 165 from both sides; divide by 12.5 (positive, so direction unchanged); s > 26.8 — tests "Solve word problems leading to inequalities of the form px + q > r... where p, q, and r are specific rational numbers"
+3. Graph: open circle at 26.8, arrow to the right — tests "Graph the solution set of the inequality"
+4. Interpretation: since number of sponsors is whole and must exceed 26.8, minimum 27 — tests "interpret it in the context of the problem"
+
+**Item 3: Misconception-exposing item (容易暴露常见误解)**
+Common misconceptions in 7.EE.4:
+1. Forgetting to reverse inequality when dividing by negative (that's more 7.EE.4b territory, though dividing by negative isn't strictly required since p is any rational... actually the standard says "specific rational numbers", which could be negative. The sign-flip is a classic misconception.)
+2. Treating inequality like equation and giving a single value answer (e.g., "x = 26.8" instead of x > 26.8) — very common: students solve and write "=" instead of ">", or interpret "how many" as a single number.
+3. Misinterpreting the graph: closed vs open circle, shading direction.
+4. In p(x + q) = r: students divide both sides by p and forget to apply to q, e.g., (x+3)/4 = 5 → x + 3 = 5... no. Or distributing incorrectly.
+5. "Undoing in wrong order": for 3x + 5 = 20, subtract... students divide first: 3x = 20 - 5... The classic error: 3x + 5 = 20 → x + 5 = 20/3? That is dividing only the 3x term: (3x)/3 + 5 = 20/3. Yes: "dividing only one term."
+6. Contextual: when answer is 26.8, saying "26.8 sponsors" or "26 sponsors" (rounding down instead of up).
+
+A good misconception item could combine several: an inequality word problem with a negative coefficient, plus a critique of a fictional student's work. "Explain/determine who is correct" formats are great for exposing misconceptions.
+
+Design: "A water tank currently holds 240 gallons and is being drained at 15 gallons per minute. The coach will stop the drain when the tank holds less than 60 gallons..." Hmm, -15m + 240 < 60 → -15m < -180 → m > 12. This has a negative coefficient (p = -15), forcing the flip. And it's a natural context.
+
+Or classic cell phone plan: "A phone company charges $40/month plus $0.05 per minute..." 
+
+Let me design Item 3 to expose the flip misconception with a critique of student work:
+
+"Diego's swim team sells yearly memberships. The team currently has $450 in its fund and must pay a $75 equipment rental fee..." hmm.
+
+Simplest natural context with negative slope: draining/filling, or a submarine descending, temperature dropping, or "subscription credit running out".
+
+"Arcade card: Mia buys an arcade card with $42 on it. Each game costs $1.50. The arcade requires at least $10 remaining to play the prize round..." Hmm, that's 42 - 1.5g ≥ 10 → -1.5g ≥ -32 → g ≤ 21.33 → at most 21 games. Negative coefficient forces flip. And it's natural.
+
+Alternatively with a fictional student's work to critique:
+
+Item: "A hot-air balloon is at 1200 feet and descends 150 feet per minute. For safety, the balloon must stay above 300 feet until it reaches the landing zone. After how many minutes must... " hmm, this gives 1200 - 150m > 300 → -150m > -900 → m < 6. So less than 6 minutes.
+
+I like the critique format: present two students' solutions, one correct, one with the flip error, ask who is right and to explain the error. This directly exposes the misconception and also connects to "compare... identifying the sequence of the operations used in each approach"? That phrase is about algebraic vs arithmetic solutions, which is for equations (part a). Hmm.
+
+For item 3, I could also target the equation misconception: comparing algebraic vs arithmetic solution — e.g., a word problem where a student solves it arithmetically ((r - q)/p style) and the item asks students to identify the operations sequence in each. That tests "Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach." But is that a "common misconception" target? The misconception there: students think the two methods are unrelated, or can't articulate the operations.
+
+The most classic, high-value misconception for 7.EE.4 is the inequality flip when dividing/multiplying by a negative. Also "solution set vs single value" and "context rounding direction." Let me design item 3 to hit the flip misconception primarily, using a drain/decrease context (negative coefficient) with a critique of student work:
+
+Item 3: "A pool contains 420 gallons of water. It drains at 12 gallons per minute. The pump must be turned off before the pool holds less than 60 gallons (to avoid damaging the pump)..." Hmm, wait. Let me think of the inequality: 420 - 12m < 60? or > ? "before the pool holds less than 60" → turn off when... Let me phrase: "The pool must be drained until it holds less than 60 gallons." So 420 - 12m < 60 → -12m < -360 → m > 30. So after more than 30 minutes... wait: 420 - 12m < 60 → -12m < -360 → m > 30. Yes, the pool holds less than 60 gallons when m > 30.
+
+And present a fictional student's work:
+
+> Student work (Diego): 
+> 420 − 12m < 60
+> −12m < −360
+> m < 30
+> "So Diego concludes the pool is below 60 gallons before 30 minutes."
+
+Hmm wait, if the student forgets to flip, they get m < 30, concluding "less than 30 minutes" — which happens to sound plausible in a draining context (time going forward). Actually the correct answer m > 30 means the pool is below 60 gallons after 30 minutes. The wrong answer m < 30 would claim the pool is below 60 gallons before 30 minutes — which is backwards (at m = 0 it's 420; the pool can't be low early). The context provides a sanity check! That's beautiful: the item exposes the misconception and students can verify with context (e.g., at 29 minutes: 420 − 348 = 72 > 60, so m < 30 is wrong; at 31: 420 − 372 = 48 < 60 ✓).
+
+So Item 3:
+
+"A swimming pool contains 420 gallons of water. It is being drained at a rate of 12 gallons per minute. The drain must be stopped after the pool holds less than 60 gallons... " Hmm, phrasing: "After how many minutes will the pool hold less than 60 gallons?" → 420 − 12m < 60.
+
+Wait — actually let me reconsider whether I want the primary task to be "solve and identify the error" or "solve on your own." A misconception-exposing item is best when it lures students INTO the misconception. The critique format doesn't lure; it tests whether students can spot it. Alternatively, a bare item "420 − 12m < 60, solve" lures students who don't know the flip. 
+
+Best design: give the word problem, ask to solve AND evaluate the fictional student's (flawed) answer — "Maria says the answer is m < 30. Do you agree? Explain." This both lures and checks. Or a two-part: (a) write and solve the inequality yourself; (b) Diego solved it as follows... and got m < 30. Identify his error and explain why it matters.
+
+I think for a clean rubric, I'll do: contextual inequality with negative coefficient, plus "A student solved it and wrote m < 30, concluding the pool drops below 60 gallons in under 30 minutes. Is this correct? Explain and fix it." And ask to verify by substitution/testing a value (this connects to reasoning about quantities).
+
+Scoring:
+1. Correct inequality from context: 420 − 12m < 60 (or equivalent) — "construct simple... inequalities... by reasoning about the quantities"
+2. Subtract 420 from both sides correctly: −12m < −360 — partial credit for correct operations sequence
+3. Divide by −12 AND reverse the inequality: m > 30 — key scoring point; this is where misconception is exposed (no credit if m < 30 without reversal... or rather, no credit for the final solution; the subtraction step still earns credit)
+4. Verdict on the student's work: wrong because dividing by a negative reverses the inequality; verification with a test value (e.g., m = 29 gives 72 gallons, not less than 60, so m < 30 can't be right; m = 31 gives 48 < 60 ✓)
+
+Hmm, but maybe I should also target the "≥ family" vs strict... No, keep focused.
+
+Alternatively, item 3 could be an equation misconception: for p(x + q) = r, students divide both sides by p but only to the x term: e.g., 3(x + 4) = 27 → x + 4 = 27/3... that's actually right if applied to both sides. The error is x + 4 = 27, then divide... whatever. The flip misconception is the strongest choice.
+
+Actually, wait — should item 3 instead target the "compare algebraic vs arithmetic" part? The prompt says "容易暴露常见误解" (likely to expose common misconceptions). The flip misconception is THE canonical one for 7.EE.4b. I'll go with that. I can mention in the verb mapping which parts it tests: "solve word problems leading to inequalities of the form px + q < r" + "reasoning about the quantities" (verification via substitution is reasoning about quantities). The p = −12 also stresses "specific rational numbers."
+
+Hmm, actually — is 420 − 12m < 60 of the form px + q < r? Yes: p = −12, q = 420, r = 60. Good, and it's a negative p which is allowed ("specific rational numbers" — negative is rational).
+
+Now item 1 (direct application): to cover the equation side (part a), including both forms px + q = r and p(x + q) = r, with rational numbers. Let me do a two-part:
+
+1a) Solve: −4x + 9 = 21 → −4x = 12 → x = −3
+1b) Solve: 2.5(x − 6) = 15 → x − 6 = 6 → x = 12
+
+Hmm, want fractions maybe. Let me use:
+1a) (2/3)x + 5 = 13... (2/3)x = 8 → x = 12. Fine, fraction coefficient.
+1b) −3(x + 4) = 18 → x + 4 = −6 → x = −10.
+
+Or combine: one equation each form, with a rational (fraction/decimal) coefficient to hit "specific rational numbers":
+- 1a: 0.5x − 1.25 = 3.75? → 0.5x = 5 → x = 10. Hmm too clean.
+- 1a: (3/4)x − 6 = −3 → (3/4)x = 3 → x = 4. 
+- 1b: −(1/2)(x − 8) = 5 → x − 8 = −10 → x = −2.
+
+Let me settle:
+1a) −6x + 14 = 2 → −6x = −12 → x = 2. (integer p)
+Hmm, want at least one non-integer rational to honor "specific rational numbers". Use:
+1a) (2/3)x + 5 = −3 → (2/3)x = −8 → x = −12. 
+1b) 0.4(x + 9) = −6 → x + 9 = −15 → x = −24. (decimal p = 0.4 = 2/5)
+
+These are clean. Scoring:
+1. Isolating variable term correctly (subtract 5 / divide both sides by 0.4 applying to the whole side): the "sequence of operations" — actually the "identifying the sequence of the operations" phrase is about comparing algebraic and arithmetic solutions. Hmm! Maybe item 1 could include a mini part: "check your solution" or even better, tie to the compare-algebraic-arithmetic phrase.
+
+Actually, the prompt asks: each item must state which verb/phrase it tests. Item 1 (direct application) tests "Solve equations of these forms fluently" (within part a, equations of form px + q = r and p(x + q) = r where p, q, r are specific rational numbers). Fluency = without a calculator/quickly/correctly. I should note that.
+
+But the "Compare an algebraic solution to an arithmetic solution" phrase — which item covers it? Maybe item 1 can have a small part (c): "For 1b, Mai solved it by working backwards arithmetically: she took −6, divided by 0.4 to get −15, then subtracted 9 to get −24. List the operations used in your algebraic solution and in Mai's arithmetic solution. How do they compare?" That would let item 1 test the compare phrase too. Hmm, that might overload item 1. Alternatively, I can note that the prompt asks for 3 items with specific types; not every phrase needs coverage. The three types requested: direct application, contextual application, misconception-exposing. I'll map:
+
+- Item 1 → "Solve equations of these forms fluently" + forms px+q=r, p(x+q)=r with rational p,q,r (part a). Optionally add the arithmetic-comparison sub-question to also cover "Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach." I think adding it as a short part (c) enriches item 1 and covers that phrase — good value. Actually, let me instead make part (c) optional enrichment... The user asked "一道直接应用" — a direct application item. Direct application = straightforward solving. I'll keep item 1 focused on fluent solving of the two forms, but add a brief note in the verb-mapping that the compare-algebraic-arithmetic phrase could be assessed via extension. Hmm.
+
+Actually, let me reconsider: "直接应用" (direct application) likely means directly applying the standard's skill — solving equations of the specified forms directly (no word problem). So item 1: solve two equations, one of each form. I'll include a check-by-substitution as a scoring point (verifies fluency/correctness). And I might add the arithmetic comparison as part of item 1's design since it's part of the same sentence... 
+
+Hmm, let me think about what makes the best 3-item set. The user's spec:
+1. 直接应用 (direct application): bare equation solving — tests "Solve equations of these forms fluently", forms px+q=r and p(x+q)=r, rational numbers.
+2. 情境应用 (contextual application): word problem → inequality → solve → graph → interpret — tests "Use variables to represent quantities...", "Solve word problems leading to inequalities of the form px+q>r", "Graph the solution set", "interpret it in the context".
+3. 误解暴露 (misconception): negative coefficient inequality flip — tests "solve word problems leading to inequalities of the form px+q<r where p, q, r are specific rational numbers" (negative p) + reasoning about quantities (verify).
+
+The "compare algebraic to arithmetic solution" phrase isn't well covered. I could fold it into item 1 as a part (c): after solving algebraically, show an arithmetic (work-backwards) solution and have students identify the operation sequences. That's actually a very natural pairing for 1b (the p(x+q)=r form). Let me do that — it strengthens coverage without adding a 4th item. 
+
+Item 1 final design:
+
+Solve each equation. Show each step. Then answer the follow-up for (b).
+
+a) (2/3)x + 5 = −3
+b) 0.4(x + 9) = −6
+c) For part (b), another student solved it by arithmetic (working backwards from −6): she divided −6 by 0.4 to get −15, then subtracted 9 to get −24. Write the sequence of operations you used in your algebraic solution, and compare it with hers. How are the two sequences related?
+
+Wait, careful with the arithmetic solution of p(x+q)=r: start from result −6, "undo" the last operation first: the expression 0.4(x+9) says: take x, add 9, multiply by 0.4 → result −6. Working backwards: divide −6 by 0.4 → x + 9 = −15, then subtract 9 → x = −24. The algebraic solution: divide both sides by 0.4 (or distribute), then subtract 9. Both use the same operations in the same order! The point of the standard: the algebraic solution mirrors the arithmetic one, operation by operation — because algebraic solving IS generalized arithmetic. That's the insight the comparison phrase targets. 
+
+So part (c): students should notice both sequences are: divide by 0.4, then subtract 9 (same operations, same order), and articulate that the algebraic solution applies those inverse operations to both sides while maintaining equality, whereas arithmetic undoes operations on the numeric result. 
+
+Answers: a) x = −12; b) x = −24; c) both: divide by 0.4 then subtract 9; the algebraic steps generalize the arithmetic undoing.
+
+Scoring for item 1:
+- a: correct first step (subtract 5 from both sides): 1 pt; correct division by 2/3 (multiply by 3/2): 1 pt; x = −12 stated: included. 
+- b: correct first step (divide both sides by 0.4 or distribute): 1 pt; correct second step: 1 pt.
+- c: correctly identifies own operation sequence: 1 pt; states that the two sequences use the same inverse operations in the same order (algebra generalizes arithmetic): 1 pt.
+
+Let me assign point values. Maybe each item worth some points; I'll do per-step credit as the user asked "评分要点（哪一步给分）" — which step earns credit. I don't strictly need a total score, but giving points helps. Let me use 4 points per item or so.
+
+Item 1 (say 6 pts):
+1. (a) subtracts 5 from both sides → (2/3)x = −8 (1 pt)
+2. (a) multiplies both sides by 3/2 → x = −12 (1 pt)
+3. (b) divides both sides by 0.4 (both terms!) → x + 9 = −15 (1 pt)
+4. (b) subtracts 9 → x = −24 (1 pt)
+5. (c) lists own sequence of operations correctly (divide by 0.4, then subtract 9) (1 pt)
+6. (c) states the two sequences match / explains the relationship (1 pt)
+
+Common misconceptions item 1 could expose... well, item 1 is the direct one; fine.
+
+Item 2 (8 pts? or 4):
+Kiran fundraising. Let me re-examine numbers: goal more than $500; has $165; each sponsor $12.50.
+12.5s + 165 > 500 → 12.5s > 335 → s > 26.8 → 27 sponsors minimum.
+
+Scoring:
+1. Defines variable (number of additional sponsors) and writes correct inequality 12.5s + 165 > 500 (accept ≥? No — context is "more than", strict >; accept equivalent forms like 165 + 12.5s > 500) (1 pt)
+2. Subtracts 165 from both sides → 12.5s > 335 (1 pt)
+3. Divides by 12.5, direction unchanged → s > 26.8 (1 pt)
+4. Graph: open circle at 26.8 (not 26 or 27; correct position), shading/arrow to the right (1 pt)
+5. Interpretation: needs at least 27 sponsors (whole number, strictly more than 26.8 → 27) (1 pt)
+
+Verb mapping item 2:
+- "Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities" — the variable definition + inequality construction + the whole-number reasoning
+- "Solve word problems leading to inequalities of the form px + q > r, where p, q, and r are specific rational numbers" (part b) — p = 12.5, q = 165, r = 500
+- "Graph the solution set of the inequality" — number line with open circle at 26.8
+- "interpret it in the context of the problem" — 27 sponsors
+
+Item 3 (misconception):
+Pool draining. 420 gallons, drains 12 gal/min. Question: after how many minutes will the volume first drop below 60 gallons? Plus Diego's flawed work to critique.
+
+Wait, let me reconsider the story: "drain must be closed before volume drops below 60 to protect the pump" — then we'd want when it REACHES 60: 420 − 12m ≤ 60 → m ≥ 30. Hmm, that changes inequality type. Let me keep it simple: "The pool is being drained for maintenance. It must be refilled once it holds less than 60 gallons." Or simply: "After how many minutes of draining will the pool hold less than 60 gallons?" → 420 − 12m < 60 → m > 30. Correct answer: more than 30 minutes; the volume first drops below 60 after 30 minutes (i.e., from the 31st minute onward... well, continuously, at m slightly > 30).
+
+Diego's flawed work:
+420 − 12m < 60
+−12m < −360 (subtract 420) — correct step!
+m < 30 (divides by −12, forgets to flip) — ERROR
+Conclusion: "less than 30 minutes" — plausible-sounding but wrong; context check: at m = 20, volume = 420 − 240 = 180, not below 60. Great.
+
+Ask: (a) Show your own solution. (b) Identify Diego's error and explain why his conclusion can't be right, using a check value.
+
+Scoring:
+1. Correct inequality from context: 420 − 12m < 60 (1 pt) — tests construct inequality by reasoning about quantities
+2. Correct first step: subtract 420 → −12m < −360 (1 pt)
+3. Divide by −12 AND reverse symbol → m > 30 (1 pt) — the key line; students who write m < 30 get no credit here (and their error is exactly the target misconception)
+4. Correct critique: error is failing to reverse the inequality when dividing both sides by a negative number (1 pt)
+5. Context verification: e.g., testing m = 29 or 30 (at 30, volume = 60 exactly, not less than 60) or m = 31 (48 < 60 ✓), or noting volume decreases over time so it can't be below 60 early (1 pt)
+
+Verb mapping item 3:
+- "Solve word problems leading to inequalities of the form px + q < r, where p, q, and r are specific rational numbers" — p = −12 (negative rational!), q = 420, r = 60
+- "construct simple... inequalities... by reasoning about the quantities" — the verification step forces reasoning about quantities (substituting/checking), and the context exposes the wrong-direction answer
+- (graph not required here since item 2 covers it — keep item 3 focused; optionally ask to graph m > 30 too? The prompt wants misconception exposure; the critique does it. I could optionally ask "graph your solution" but let's not bloat. Actually, hmm — should I include graphing in item 3 to reinforce? The misconception item is already rich. I'll leave graphing to item 2 and note it.)
+
+Wait, also consider: should the misconception item instead be about the equation-side misconception (e.g., in 0.4(x+9)=−6, dividing only the x term)? The inequality flip is more canonical and severe. Also note: dividing by a negative — is that in scope for 7.EE.4? The standard says inequalities px + q > r or < r with p, q, r rational — p can be negative, and solving requires dividing by negative p, which is where the flip arises. Yes, in scope. Also, some might argue the flip rule is formally 7.EE.4b territory... it's exactly there. Good.
+
+Also, one more consideration for item 3: making the coefficient negative via "420 − 12m" — when solved by "subtract 420, then divide by −12", the flip arises. Alternatively students could rearrange: −12m < −360 → 12m > 360 → m > 30 (moving terms). Either path needs the reversal insight. Good.
+
+Now, the user wants:
+1. First, the standard's original text and page number (先给出该编号的原文和页码). Include code, grade, domain, cluster, requirement (English original), PDF page P49. Maybe translation. The skill says: 引用课标要求时给出原文（英文）加编号，必要时再翻译；一并给出 grade/domain 和 pdf_page.
+
+Format: I should present a clean structured answer in Chinese (the user writes in Chinese). Structure:
+
+## 课标原文
+- 编号 7.EE.4，Grade 7, Domain: Expressions and Equations
+- Cluster: Solve real-life and mathematical problems using numerical and algebraic expressions and equations.
+- Requirement (English original, quoted in full)
+- PDF 页码：P49
+- 中文翻译 (brief)
+
+## 题目 1：直接应用
+题干 / 参考答案 / 评分要点 / 测查的原文动词短语
+
+## 题目 2：情境应用
+...
+
+## 题目 3：误解暴露题
+...
+
+For each item, "逐题说明它测的是原文里的哪个动词/短语" — quote the exact verb phrases: "Solve equations of these forms fluently", "Use variables to represent quantities", "construct simple equations and inequalities... by reasoning about the quantities", "Solve word problems leading to inequalities of the form px + q > r", "Graph the solution set of the inequality", "interpret it in the context of the problem", "Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach", "specific rational numbers".
+
+Let me now write out all the details carefully.
+
+**Item 1 details:**
+
+a) (2/3)x + 5 = −3
+Step: subtract 5: (2/3)x = −8
+Multiply by 3/2: x = −8 · 3/2 = −12. ✓ Check: (2/3)(−12) = −8; −8 + 5 = −3 ✓
+
+b) 0.4(x + 9) = −6
+Divide both sides by 0.4: x + 9 = −6/0.4 = −15
+Subtract 9: x = −24. ✓ Check: 0.4(−24 + 9) = 0.4(−15) = −6 ✓
+
+c) Arithmetic solution of (b): Start with −6 (result), undo "multiply by 0.4" → divide −6 by 0.4 = −15 (this recovers x + 9), undo "add 9" → subtract 9 → −24.
+Algebraic solution sequence: divide both sides by 0.4, subtract 9 from both sides.
+Comparison: same two inverse operations, in the same order — divide by 0.4, then subtract 9. The difference: arithmetic works backward on the numeric result; algebra applies the same inverse operations to both sides of the equation, which is why it works for any numbers (generality).
+
+Scoring (per step, which the user emphasized):
+- 1a: 正确第一步（两边减 5）得 (2/3)x = −8 → 给分
+- 1a: 两边乘 3/2（除以 2/3）得 x = −12 → 给分（若 −8 × 3/2 算错不给这步的分）
+- 1b: 两边同除以 0.4（注意是整边，不能只除 x 项）得 x + 9 = −15 → 给分
+- 1b: 两边减 9 得 x = −24 → 给分
+- 1c: 正确列出自己的运算序列（÷0.4 → −9）→ 给分
+- 1c: 指出两条序列相同（顺序一致），并说明代数解是把算术"倒推"推广到等式两边 → 给分
+
+Misconception note for item 1: dividing only one term by 0.4 (0.4x + 9 = −6) would be caught in 1b. But item 1 doesn't need to be misconception-focused; item 3 is. I can mention briefly.
+
+Hmm wait, actually for 1b if a student distributes first: 0.4x + 3.6 = −6 → 0.4x = −9.6 → x = −24. Also valid; accept in rubric ("或先分配也行").
+
+**Item 2 details:**
+
+Kiran fundraising: goal more than $500, already $165, each sponsor $12.50.
+
+Hmm, let me double check "each additional sponsor donates $12.50" — okay.
+
+a) Let s = number of additional sponsors. Inequality: 165 + 12.5s > 500.
+b) 12.5s > 335 → s > 26.8
+c) Number line: open circle at 26.8, shade right.
+d) Since sponsors are whole and s must exceed 26.8, minimum 27 sponsors.
+
+Check: 27 sponsors: 165 + 12.5×27 = 165 + 337.5 = 502.5 > 500 ✓. 26 sponsors: 165 + 325 = 490 < 500 ✓ (insufficient). 
+
+Scoring:
+- 定义变量并写出正确不等式 165 + 12.5s > 500（或等价）→ 1 pt（写成方程或 26.8 相关的方程不给）
+- 两边减 165 → 12.5s > 335 → 1 pt
+- 两边除以 12.5 → s > 26.8（方向不变）→ 1 pt
+- 数轴图：26.8 处空心点 + 向右射线 → 1 pt（空心/实心错、位置标成 26 或 27、方向反，均不给或部分给）
+- 情境解释：至少 27 位（向上取整理由：26.8 不是整数且必须"超过"）→ 1 pt
+
+Note the rounding misconception: students who answer "26.8 sponsors" or round DOWN to 26 fail the interpretation (common misconception: treating a decimal count as valid, or rounding down). I can note this. Item 2 is "情境应用" though — the interpretation step is part of the standard. Item 3 is the deliberate misconception item. I'll mention in item 2's notes that the final step catches the rounding-direction misconception as a bonus.
+
+**Item 3 details:**
+
+Pool: 420 gallons, drains at 12 gal/min.
+
+Question: "During maintenance, the pool is drained at a constant rate of 12 gallons per minute. The pool now contains 420 gallons. The maintenance crew must schedule the refill once the pool holds less than 60 gallons. After how many minutes will the pool hold less than 60 gallons?"
+
+Hmm, actually simpler: "For how many minutes can the pool drain before its volume drops below 60 gallons?" — that phrasing suggests ≤ boundary. Let me just ask: "After how many minutes of draining will the pool contain less than 60 gallons?" → 420 − 12m < 60, m > 30, so after more than 30 minutes (from 30 minutes onward it's at/below... at exactly 30 it's exactly 60, not less). So: for m > 30; the volume is below 60 starting just after 30 minutes. In context: "after more than 30 minutes" / "any time after 30 minutes (not including 30)". If minutes are whole: from the 31st minute on. Hmm, with continuous draining, m > 30 exactly. Fine.
+
+Diego's work presented:
+```
+420 − 12m < 60
+−12m < −360        (subtract 420 from both sides)
+m < 30             (divide both sides by −12)
+```
+Diego says: "So in less than 30 minutes the pool will be below 60 gallons."
+
+Tasks:
+(a) Write and solve the inequality yourself. When is the pool below 60 gallons?
+(b) Find Diego's error and explain why his conclusion cannot be right. Support with a check using a specific number of minutes.
+
+Answers:
+(a) 420 − 12m < 60 → −12m < −360 → m > 30. The pool holds less than 60 gallons for any time after 30 minutes (at 30 min it's exactly 60).
+(b) Error: when dividing both sides of an inequality by a negative number (−12), the inequality symbol must be reversed; he kept "<". Check: at m = 20 (which satisfies Diego's m < 30): 420 − 240 = 180 gallons — way above 60, so his conclusion fails. At m = 31: 420 − 372 = 48 < 60 ✓. So m > 30 is right.
+
+Scoring:
+- 从情境写出不等式 420 − 12m < 60（或等价，如 60 > 420 − 12m）→ 1 pt
+- 两边减 420 得 −12m < −360 → 1 pt
+- 两边除以 −12 并反转符号得 m > 30 → 1 pt（写了 m < 30 此步 0 分——这正是要暴露的误解）
+- 指出 Diego 的错误：不等式两边同除以负数时必须反转不等号 → 1 pt
+- 用数值检验支持判断（如 m = 20 时剩 180 加仑，不小于 60；m = 31 时 48 加仑）或用"水量随时间递减"的常识推理 → 1 pt
+
+Verb mapping for item 3:
+- "Solve word problems leading to inequalities of the form px + q < r, where p, q, and r are specific rational numbers" — p = −12（负有理数）, q = 420, r = 60. 负系数把"除以负数要变号"逼出来，这是 7.EE.4b 最典型的误解点。
+- "construct simple... inequalities... by reasoning about the quantities" — 从情境建构不等式 + 用代入检验（reasoning about quantities 反面验证 Diego 的结论）
+- (The context check also aligns with MP... no need to cite math practices; stick to the standard's own verbs.)
+
+Also worth noting: 420 − 12m < 60 — hmm, is that "of the form px + q < r"? p = −12, q = 420. Yes.
+
+Now — the "先给出该编号的原文和页码" — present at top:
+
+**7.EE.4（Grade 7 — Expressions and Equations）**
+Cluster: Solve real-life and mathematical problems using numerical and algebraic expressions and equations.
+原文（English）：
+"Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities.
+a. Solve word problems leading to equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers. Solve equations of these forms fluently. Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach.
+b. Solve word problems leading to inequalities of the form px + q > r or px + q < r, where p, q, and r are specific rational numbers. Graph the solution set of the inequality and interpret it in the context of the problem."
+PDF 页码：P49
+
+Plus 中文大意 (translation) — the skill says "必要时再翻译", and given the user writes in Chinese, a translation is helpful. I'll add a concise translation.
+
+Then the three items. Let me also double-check the arithmetic once more.
+
+Item 1a: (2/3)x + 5 = −3 → (2/3)x = −8 → x = −8 × (3/2) = −12. Check: (2/3)(−12) = −8, −8+5 = −3 ✓.
+Item 1b: 0.4(x + 9) = −6 → x + 9 = −6 ÷ 0.4 = −15 → x = −24. Check: −24 + 9 = −15; 0.4 × (−15) = −6 ✓.
+Alternative distribute: 0.4x + 3.6 = −6 → 0.4x = −9.6 → x = −24 ✓.
+
+Item 1c arithmetic: start from −6; divide by 0.4 → −15; subtract 9 → −24. Sequence: ÷0.4, then −9. Algebraic: same order. ✓
+
+Item 2: 165 + 12.5s > 500 → 12.5s > 335 → s > 26.8. Check 27: 165 + 337.5 = 502.5 > 500 ✓; 26: 490 < 500 ✓. Graph: open circle at 26.8, right. Interpretation: at least 27 sponsors.
+
+Item 3: 420 − 12m < 60 → −12m < −360 → m > 30. Check m = 31: 420 − 372 = 48 < 60 ✓; m = 20: 180 > 60 (Diego wrong) ✓; m = 30: exactly 60, not less ✓.
+
+All good. Now let me also map the verbs precisely per item:
+
+Item 1 (直接应用):
+- "Solve equations of these forms fluently" — 直接考流利解 px+q=r 与 p(x+q)=r 两类方程。
+- "equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers" — 系数取 2/3 和 0.4（非整数有理数）。
+- 1c 考 "Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach." — 要求列出两种解法的运算序列并比较。
+
+Item 2 (情境应用):
+- "Use variables to represent quantities in a real-world or mathematical problem" — 自己设变量 s。
+- "construct simple equations and inequalities to solve problems by reasoning about the quantities" — 由情境构造不等式。
+- "Solve word problems leading to inequalities of the form px + q > r, where p, q, and r are specific rational numbers" — p = 12.5, q = 165, r = 500。
+- "Graph the solution set of the inequality" — 数轴作图。
+- "interpret it in the context of the problem" — 整数化解释（至少 27 位赞助人）。
+
+Item 3 (误解暴露):
+- "Solve word problems leading to inequalities of the form px + q < r, where p, q, and r are specific rational numbers" — p = −12（负系数），除以负数须变号，这是该句下最典型的误解。
+- "construct simple... inequalities... by reasoning about the quantities" — 建模 + 用代入具体数值检验（数值推理）暴露 m < 30 的荒谬。
+
+Also, in the scoring sections, the user asked "评分要点（哪一步给分）" — I'll enumerate step-by-step credits with point values. I'll assign points per item; let me do:
+- Item 1: 6 points (2 per sub-part roughly)
+- Item 2: 5 points
+- Item 3: 5 points
+
+Or just describe steps without point sums? "哪一步给分" suggests listing which steps earn credit. Points make it concrete. I'll give each item a point structure, e.g., Item 1: 1 pt per step × 6.
+
+Presentation language: Chinese with English standard quotes and English item stems? The items are for US Common Core grade 7 — likely should be written in English (as actual test items) with Chinese explanations. I'll write the item stems in English (as they'd appear on an assessment) — since the course standard is in English. Actually, mixed: 题干 in English is more authentic and directly usable; 参考答案/评分要点 in Chinese for clarity. Hmm, but the user is Chinese-speaking. The prompt is in Chinese. I think presenting item stems bilingually or in English with Chinese rubric is good. Let me write stems in English (authentic items) and keep answers/rubrics in Chinese with English where needed. Actually — to be safe and maximally useful, I'll write the item stems in English (they're US assessment items; numbers and math are universal) and the answer keys in Chinese. Or full Chinese? Let me consider: the user says "每题给出题干、参考答案、评分要点". If the user is a Chinese teacher preparing CC-aligned items (this repo context is a calculus-quest project with math-standards skill), English stems are appropriate since the standards are US. I'll do English stems + Chinese annotations. Hmm, but maybe they teach in Chinese... The safest: English stem (authentic) with a Chinese translation right below in parentheses? That doubles length. I'll go with English stems and Chinese for everything else; add a one-line Chinese gloss for each stem. Actually, let me just write stems in English and provide 参考答案 bilingual-ish (numbers + Chinese explanation). I think that's clean.
+
+Hmm, wait. Let me reconsider — the user's request is entirely in Chinese, and they want 题干. If I give only English 题干, a Chinese-speaking user can still read basic math English. But to be friendly, I'll give each stem in English followed by a brief Chinese translation in italics or parentheses. That's more useful. Let me keep translations concise.
+
+Also note the skill's 回答约定: quote the original English + code, give grade/domain and pdf_page. Done at top.
+
+One more check on the standard text: the CSV requirement starts with "4. Use variables..." — the "4." prefix is the standard number within the cluster. I'll quote it as-is or strip the "4." prefix — better to strip and note it's standard 4 of the cluster, or just quote including "4."? I'll quote without the leading "4." but mention structure. Actually simpler: quote exactly as in the table but the "4." is part of numbering; I'll present "7.EE.4" and then the text. I'll keep the text without "4." for readability. Hmm, but "引用原文" — I should be faithful. The table's requirement field literally begins with "4. Use variables...". I'll include it as-is to be faithful. Fine, include "4." — it's the standard's own numbering in the PDF anyway.
+
+Let me also double check cluster title: "Solve real-life and mathematical problems using numerical and algebraic expressions and equations." ✓.
+
+Domain: Expressions and Equations. Grade: 7. PDF page: P49.
+
+Now, one more consideration on item 2's inequality direction: "more than $500" → strict >, matching "px + q > r" exactly. Good — item 2 uses >, item 3 uses <, covering both forms in the standard. Nice symmetry.
+
+Item 1 uses both equation forms (a: px+q=r; b: p(x+q)=r). Excellent coverage:
+- px+q=r ✓ (1a)
+- p(x+q)=r ✓ (1b)
+- fluency ✓ (item 1 as a whole, no-calculator implied)
+- compare algebraic/arithmetic ✓ (1c)
+- px+q>r ✓ (item 2)
+- graph solution set ✓ (item 2c)
+- interpret in context ✓ (item 2d, also item 3 verification)
+- px+q<r ✓ (item 3)
+- use variables to represent quantities ✓ (item 2a, 3a)
+- reasoning about quantities ✓ (item 2 interpretation, item 3 verification)
+
+Full coverage of 7.EE.4 across 3 items. I should point this out briefly at the end (a coverage map) — that adds value showing the set covers all verbs of the standard.
+
+Point allocations — let me make them explicit:
+
+Item 1 (6 分):
+1a:
+- 步骤分①：两边同时减 5，得 (2/3)x = −8（1 分）— 考"逆运算选对、写对等式"
+- 步骤分②：两边同乘 3/2（或除以 2/3），得 x = −12（1 分）— 有理数乘法正确
+1b:
+- 步骤分③：两边同除以 0.4，得 x + 9 = −15（1 分）— 注意除的是"整边"；只除 x 项不给此分
+- 步骤分④：两边减 9，得 x = −24（1 分）—（先分配再解：0.4x + 3.6 = −6 → 0.4x = −9.6 → x = −24，同样给满）
+1c:
+- 步骤分⑤：正确写出自己代数解的运算序列：÷0.4 → −9（1 分）
+- 步骤分⑥：指出算术解序列与代数解序列相同（都是"除以 0.4，再减 9"），并能说明代数解是把它作用到等式两边（1 分）
+
+Item 2 (5 分):
+- ① 设 s = 追加赞助人数，并写出 165 + 12.5s > 500（或等价）（1 分）— 只写方程或没设变量不给
+- ② 两边减 165：12.5s > 335（1 分）
+- ③ 两边除以 12.5：s > 26.8（1 分）— 方向不变
+- ④ 数轴：26.8 处空心圆点、向右（1 分）— 实心点或向左不给；圆点标在 26 或 27 不给
+- ⑤ 解释：人数是整数且需"超过 26.8"，至少 27 人（1 分）— 答 26.8 人或 26 人不给
+
+Item 3 (5 分):
+- ① 写出不等式 420 − 12m < 60（或等价）（1 分）
+- ② 两边减 420：−12m < −360（1 分）
+- ③ 两边除以 −12 且反转不等号：m > 30（1 分）— 写 m < 30 此步 0 分（目标误解）
+- ④ 指出 Diego 错在哪：两边同除负数必须反转不等号（1 分）
+- ⑤ 用数值验证/情境推理支持：如 m = 20 时剩 180 加仑（>60），说明 m < 30 不成立；m = 31 时剩 48 加仑（<60）✓；或指出"排水时间越长水越少，不可能前 30 分钟内就低于 60"（1 分）
+
+Good. Also I should note in item 3's 参考答案: at m = 30 exactly 60 gallons (not less than 60), so strictly m > 30.
+
+Now the item 2 Chinese gloss and item 3 Chinese gloss.
+
+Item 2 stem (English):
+"Kiran is raising money for a charity walk. His goal is to raise more than $500. He has already raised $165. Each additional sponsor donates $12.50.
+(a) Use a variable to represent the number of additional sponsors Kiran needs, and write an inequality that can be used to find when he will reach his goal.
+(b) Solve the inequality.
+(c) Graph the solution set on a number line.
+(d) What is the minimum number of additional sponsors Kiran needs? Explain."
+
+中文大意: Kiran 为慈善健走筹款，目标是"超过"500 美元；已筹 165 美元，每位新赞助人捐 12.50 美元。设变量写不等式、求解、画数轴、解释至少需要多少位赞助人。
+
+Item 3 stem (English):
+"A pool contains 420 gallons of water and is draining at a constant rate of 12 gallons per minute.
+(a) Write and solve an inequality to find after how many minutes the pool will contain less than 60 gallons.
+(b) Diego solved the problem like this:
+  420 − 12m < 60
+  −12m < −360   (subtracted 420 from both sides)
+  m < 30        (divided both sides by −12)
+  He concluded: 'The pool contains less than 60 gallons in less than 30 minutes.'
+  Identify Diego's error, and use a specific number of minutes to show why his conclusion cannot be correct."
+
+中文大意: 泳池有 420 加仑水，以每分钟 12 加仑匀速放水。(a) 写出并解不等式求何时水量低于 60 加仑；(b) 指出 Diego 解法（忘记变号得 m < 30）的错误，并用具体分钟数验证说明其结论必错。
+
+Item 1 stem (English):
+"Solve each equation, showing each step.
+(a) (2/3)x + 5 = −3
+(b) 0.4(x + 9) = −6
+(c) For part (b), Mai solved the equation by working backwards with arithmetic: she divided −6 by 0.4 to get −15, then subtracted 9 to get −24. List the operations you used in your algebraic solution, in order, and compare your sequence of operations with Mai's. What do you notice?"
+
+中文大意: (a)(b) 两步解方程；(c) Mai 用算术"倒推"解了 (b)：−6 ÷ 0.4 = −15，再减 9 得 −24。按顺序列出你代数解的运算，与 Mai 的运算序列比较，说说发现。
+
+Wait — careful with Mai's arithmetic phrasing: "she divided −6 by 0.4 to get −15, then subtracted 9 to get −24." The undoing: from result −6, undo multiply-by-0.4 → divide by 0.4 → gets −15 (= x + 9); undo add-9 → subtract 9 → −24. ✓. 
+
+In 1c the expected observation: both sequences are "divide by 0.4, then subtract 9" — identical order and operations. Explanation of why: solving the equation algebraically is doing the same backward undoing as arithmetic, just applied to both sides — that's the "compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach" phrase verbatim.
+
+Also, for 1a, does the arithmetic comparison apply too? We only ask for (b). Fine.
+
+Also, potential subtlety in 1c: some students' algebraic solution for (b) might be distribute-first: 0.4x + 3.6 = −6 → subtract 3.6 → divide by 0.4. That sequence (subtract 3.6, then divide by 0.4) is NOT the same as Mai's (divide by 0.4, then subtract 9). That's actually a richer comparison — the sequences differ in order (though both undo the same operations in reverse order relative to construction... wait no: distribute-first solution subtracts 3.6 (= 0.4×9) first then divides by 0.4; arithmetic divide-first undoes multiplication first. Both are valid but operation sequences differ). Hmm — this creates rubric ambiguity for step ⑥. 
+
+To control this, the intended algebraic path is "divide both sides by 0.4 first". If a student distributes first, their comparison answer would be "my sequence is different from Mai's: I subtracted 3.6 first..." — is that wrong? Not wrong mathematically, and the comparison phrase just requires identifying sequences in each approach and comparing. The insight "algebra mirrors arithmetic" comes through most cleanly with the divide-first path. In the rubric, I'll note: 若学生用分配律先展开（0.4x + 3.6 = −6 → 0.4x = −9.6 → x = −24），其序列是"减 3.6、除以 0.4"，与 Mai 的"除以 0.4、减 9"顺序不同——此时⑥给分的标准是能正确列出两条序列并说明异同（而不是必须说"相同"）。Hmm, that's a fair rubric note. But it complicates. Alternatively, simplify 1c to focus on the divide-first path: I can hint in the stem "(if you used the distributive property in (b), instead solve it again by dividing both sides by 0.4 first)". Hmm, that's clunky.
+
+Actually — it's fine. The point of (c) is the comparison skill itself. Let me handle it in the rubric: 
+- ⑤ 给分标准：正确按序列出自己的运算（任一正确路径均可）。
+- ⑥ 给分标准：正确列出 Mai 的序列（÷0.4 再 −9），并做出正确比较：若走"先除"路径，两条序列完全相同（顺序也相同），说明代数解就是算术倒推的一般化；若走"先分配"路径，能指出自己的序列是"−3.6 再 ÷0.4"、与 Mai 顺序不同但同样有效。核心是"identify the sequence of the operations used in each approach"。
+
+Hmm wait, actually if distribute-first: 0.4(x+9) = −6 → 0.4x + 3.6 = −6. To undo: subtract 3.6 (not 9!) then divide by 0.4. So the sequence differs. The student comparing should notice "different order, because the distributive property rewrote the expression first." OK the rubric note handles it. But honestly, for grade 7 the cleaner intent is divide-first. I'll phrase (c) to nudge: "Mai solved it by working backwards... Compare your sequence of operations with hers." and in rubric note the alternative path. Good enough.
+
+Alternatively I could design 1c around 1a instead? (2/3)x + 5 = −3 arithmetic: start −3, subtract 5 → −8, divide by 2/3 → multiply 3/2 → −12. Algebraic: subtract 5, multiply by 3/2 — same sequence, no alternative path ambiguity (no distributing possible)! That's cleaner! For px + q = r there's only one sensible path: subtract q then divide by p — identical to arithmetic undoing. The ambiguity only arises for p(x+q)=r. Hmm, but even for 1a, a student could... hmm, there's really no alternative path for (2/3)x + 5 = −3. 
+
+But wait — the compare phrase in the standard is listed under part a which mentions both forms... The classic illustration of algebra-arithmetic correspondence is the px+q=r form. Hmm, but p(x+q)=r also has a direct arithmetic undo (divide first). Either works. Using (a) avoids the distribute-first ambiguity. But then the arithmetic for (a) involves fraction ops: −3 − 5 = −8; −8 ÷ (2/3) = −12. Clean.
+
+Let me restructure: keep both equations in 1a/1b for fluency (both forms), and put the comparison on... hmm, actually why not make the comparison about equation (a)? Then any algebraic solution of (a) is essentially forced: subtract 5, multiply by 3/2. Mai's arithmetic: start from −3, subtract 5 → −8, divide by 2/3 (= multiply by 3/2) → −12. Sequences match exactly: subtract 5, then divide by 2/3. 
+
+That's cleaner for rubric. But there's a subtle nuance: in arithmetic "work backwards", each step undoes the LAST operation applied in building the expression; in algebra you also undo in reverse order (SADMEP). Same order. Good.
+
+I'll attach (c) to part (a) then. Hmm, but wait: is there pedagogical value in using (b)? The p(x+q)=r form is where "undo order" misconceptions live (students want to subtract 9 first from both sides — which doesn't isolate since the 9 is inside the parentheses multiplied by 0.4... well, subtracting 9 from both sides of 0.4(x+9) = −6 gives 0.4(x+9) − 9 = −15, useless). The arithmetic comparison for (b) is richer but rubric-messier. For a clean deliverable, use (a). Hmm, let me think once more...
+
+Actually, let me use (b) but with a stem that says "Mai solved part (b) by arithmetic..." and in the rubric accept both paths with the note. No wait — simpler deliverable, cleaner rubric: use (a). Hmm. But then (b) tests only fluency of the p(x+q)=r form, and the comparison tests only px+q=r. That's fine — combined, item 1 covers: both forms + fluency + compare-algebraic-arithmetic. 
+
+Decision: (c) compares Mai's arithmetic solution of equation (a) with the student's algebraic solution of (a).
+
+Wait, one more consideration — with (a) being (2/3)x + 5 = −3: Mai's arithmetic: "start with −3, subtract 5, then divide by 2/3." In expression-building order: x → ×(2/3) → +5 → −3. Undo: −3 −5 = −8, then −8 ÷ (2/3) = −12. ✓.
+
+Scoring ⑤: 列出自己的序列"两边减 5 → 两边 ÷(2/3)"（或"×3/2"）。
+Scoring ⑥: 指出 Mai 的序列与自己的序列一致（都是先减 5、再除以 2/3）；结论：代数解法就是把算术倒推推广为"对等式两边同时做逆运算"。若有学生给出其他路径（其实 (a) 无其他路径，除非先把 x 项…… no alternative exists），fine.
+
+Hmm, wait, actually there IS an alternative for (a): a student could rewrite as (2/3)x = −3 − 5... same thing. Or multiply both sides by 3 first: 2x + 15 = −9 → 2x = −24 → x = −12. Oh! That's an alternative path: multiply by 3, subtract 15, divide by 2. Hmm. Then sequence: ×3 → −15 → ÷2, which differs from Mai's (−5, ÷2/3). If a student does that, they'd compare: "mine is different but equivalent". Rubric note: 能正确识别两种解法的运算序列并比较即可；标准路径下两者一致。Eh, it's fine — rubric note covers it. The essence of ⑥: 正确识别每种方法的运算序列 + 比较异同（说清楚谁先谁后）。I'll phrase the scoring point to focus on "identifying the sequence of the operations used in each approach" — matching the standard's wording — rather than mandating "they're identical".
+
+Hmm OK, I realize I'm overthinking. Let me write the final answer now.
+
+Structure of final answer:
+
+# 课标原文（先给）
+- 7.EE.4 · Grade 7 · Expressions and Equations（域）
+- Cluster（所属簇）: Solve real-life and mathematical problems using numerical and algebraic expressions and equations.
+- 原文: full quote (a + b)
+- PDF 页码: **P49**
+- 中文大意: short translation
+
+# 题目一：直接应用（bare equations, fluency + both forms + algebra-vs-arithmetic compare）
+题干 (English + 中文大意)
+参考答案
+评分要点 (numbered steps with points)
+测查的动词/短语 mapping
+
+# 题目二：情境应用 (word problem → inequality >, graph, interpret)
+same structure
+
+# 题目三：误解暴露 (negative coefficient, flip error, critique + verify)
+same structure
+
+Optionally a small coverage table at the end mapping each phrase of the standard to items. That's a nice wrap-up showing the 3 items cover every verb phrase. Keep it compact.
+
+Let me draft the final content.
+
+---
+
+## 课标原文
+
+**7.EE.4** · Grade 7 · 域：Expressions and Equations
+簇：Solve real-life and mathematical problems using numerical and algebraic expressions and equations.
+PDF 页码：**P49**
+
+原文：
+
+> "Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities.
+> a. Solve word problems leading to equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers. Solve equations of these forms fluently. Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach.
+> b. Solve word problems leading to inequalities of the form px + q > r or px + q < r, where p, q, and r are specific rational numbers. Graph the solution set of the inequality and interpret it in the context of the problem."
+
+中文大意：用变量表示现实或数学问题中的量，通过推理数量关系构造简单方程/不等式解决问题；a) 解由实际问题得出的形如 px+q=r 与 p(x+q)=r 的方程（p、q、r 为特定有理数），要求熟练求解，并能比较代数解法与算术解法、指出每种方法所用的运算序列；b) 解形如 px+q>r 或 px+q<r 的不等式（p、q、r 为特定有理数），在数轴上画出解集并解释其在问题情境中的含义。
+
+## 题目 1（直接应用）
+
+题干：
+Solve each equation. Show every step.
+(a) 2/3·x + 5 = −3
+(b) 0.4(x + 9) = −6
+(c) Mai solved equation (a) by working backwards with arithmetic: start with −3, subtract 5 to get −8, then divide by 2/3 to get −12. In order, list the operations you used in your algebraic solution of (a), and compare your sequence with Mai's. What do you notice?
+
+（中文大意：(a)(b) 逐步解方程；(c) Mai 用算术倒推解 (a)：从 −3 出发先减 5 得 −8，再除以 2/3 得 −12；请按顺序列出你代数解法用到的运算，与 Mai 的序列比较，写出发现。）
+
+参考答案：
+(a) 两边减 5：(2/3)x = −8；两边乘 3/2：x = −12。（检验：(2/3)(−12)+5 = −8+5 = −3 ✓）
+(b) 两边除以 0.4：x + 9 = −15；两边减 9：x = −24。（或先分配：0.4x + 3.6 = −6 → 0.4x = −9.6 → x = −24。检验：0.4(−24+9) = 0.4×(−15) = −6 ✓）
+(c) 代数解序列：两边减 5 → 两边除以 2/3（即乘 3/2）。Mai 的算术序列：减 5 → 除以 2/3。两条序列的运算与顺序完全相同；区别在于算术倒推只对数值做逆运算，而代数解对等式两边同时做同样的逆运算，因此对任何 px+q=r 都成立——代数解就是算术倒推的一般化。
+
+评分要点（每步 1 分，共 6 分）：
+1. (a) 两边同减 5，得 (2/3)x = −8 —— 逆运算选对、等式两边同变
+2. (a) 两边同乘 3/2（除以 2/3），得 x = −12 —— 有理数运算正确
+3. (b) 两边同除以 0.4，得 x + 9 = −15 —— 必须除"整边"；只除 x 一项（写成 0.4x + 9 = −6）此步不给分
+4. (b) 两边同减 9，得 x = −24（先分配再解同样给满这两步）
+5. (c) 按顺序正确列出自己代数解的运算序列（"减 5、再除以 2/3"；若走"两边乘 3：2x+15=−9 → 2x=−24 → x=−12"的路径，需如实列出）
+6. (c) 正确复述 Mai 的序列并作出比较：两条序列一致（或能说清自己路径与她路径的异同），能点出"代数 = 把算术倒推同时作用于两边"这一关系
+
+测查的原文动词/短语：
+- "Solve equations of these forms **fluently**"：整题限时、不用计算器，直接考两类方程的熟练求解。
+- "equations of the form **px + q = r** and **p(x + q) = r**, where p, q, and r are **specific rational numbers**"：(a) 取 p = 2/3（分数系数）、(b) 取 p = 0.4（小数系数），两种形式各一道。
+- "Compare an algebraic solution to an arithmetic solution, **identifying the sequence of the operations used in each approach**"：(c) 要求列出并比较两种解法的运算序列。
+
+## 题目 2（情境应用）
+
+题干：
+Kiran is raising money for a charity walk. His goal is to raise more than $500. So far he has raised $165. Each additional sponsor donates $12.50.
+(a) Use a variable to represent the number of additional sponsors Kiran needs, and write an inequality that can be used to find when he reaches his goal.
+(b) Solve the inequality.
+(c) Graph the solution set on a number line.
+(d) What is the minimum whole number of additional sponsors Kiran needs? Explain how you know.
+
+（中文大意：Kiran 为慈善健走筹款，目标是筹得"超过"500 美元；已筹 165 美元，每位新赞助人捐 12.50 美元。(a) 设变量、列不等式；(b) 解不等式；(c) 在数轴上画解集；(d) 他至少还需要多少位赞助人？说明理由。）
+
+参考答案：
+(a) 设 s = 追加赞助人数，则 165 + 12.5s > 500（写作 12.5s + 165 > 500 等价均可）。
+(b) 两边减 165：12.5s > 335；两边除以 12.5：s > 26.8。
+(c) 数轴上 26.8 处画**空心圆点**，向右画射线（26.8 不含在解集内）。
+(d) 至少 **27** 位。因为 s 必须是整数且要严格大于 26.8：26 位时 165 + 12.5×26 = 490（不够），27 位时 165 + 12.5×27 = 502.5（达标）。
+
+评分要点（每步 1 分，共 5 分）：
+1. 设出变量并写出正确不等式 165 + 12.5s > 500 —— 只写方程、或不设变量，此步不给分
+2. 两边减 165，得 12.5s > 335
+3. 两边除以 12.5，得 s > 26.8 —— 不等号方向不变（p 为正）
+4. 数轴图：26.8 处空心圆点 + 向右 —— 圆点画成实心、位置标成 26 或 27、方向画反，此步不给分
+5. 情境解释：至少 27 位，理由涉及"整数 + 必须超过 26.8" —— 答"26.8 位"或四舍五入方向错（26 位）不给分（这是常见的"机械取整"误解，可在此步顺带暴露）
+
+测查的原文动词/短语：
+- "**Use variables to represent quantities in a real-world or mathematical problem**"：(a) 要求学生自己设变量 s。
+- "construct simple **equations and inequalities** to solve problems **by reasoning about the quantities**"：由"超过 500"构造严格不等式，以及 (d) 中按量的实际含义（人数为整数）推理。
+- "Solve word problems leading to **inequalities of the form px + q > r**, where p, q, and r are **specific rational numbers**"：本题 p = 12.5，q = 165，r = 500，严格">"型。
+- "**Graph the solution set** of the inequality"：(c) 数轴作图。
+- "**interpret it in the context of the problem**"：(d) 把 s > 26.8 解释为"至少 27 位"。
+
+## 题目 3（误解暴露题）
+
+题干：
+A pool contains 420 gallons of water and is draining at a constant rate of 12 gallons per minute.
+(a) Write and solve an inequality to find after how many minutes the pool will contain less than 60 gallons.
+(b) Diego solved the problem like this:
+  420 − 12m < 60
+  −12m < −360 (subtracted 420 from both sides)
+  m < 30 (divided both sides by −12)
+He concluded: "Within 30 minutes, the pool will contain less than 60 gallons."
+Identify Diego's error, and use one or more specific numbers of minutes to show why his conclusion cannot be correct.
+
+（中文大意：泳池原有 420 加仑水，以每分钟 12 加仑匀速放水。(a) 写出并解不等式，求多少分钟后水量低于 60 加仑；(b) Diego 解得 m < 30，并断言"30 分钟内水量就会低于 60 加仑"。请指出他的错误，并用具体的分钟数说明他的结论为什么不可能成立。）
+
+参考答案：
+(a) 设 m = 放水分钟数：420 − 12m < 60 → −12m < −360 → **m > 30**（两边除以 −12 时不等号反转）。即 30 分钟后（不含 30 分钟整，那时恰为 60 加仑）水量低于 60 加仑。
+(b) Diego 的错误：不等式两边同除以负数（−12）时，不等号方向必须反转，他仍写 "<"。检验：取 m = 20（满足他的 m < 30）：剩余 420 − 240 = 180 加仑，远大于 60，结论不成立；取 m = 31：420 − 372 = 48 < 60 ✓，与 m > 30 一致。也可以不代数：水随时间减少，前 30 分钟内水量不可能低于 60（30 分钟整时恰好等于 60），所以"30 分钟内低于 60"必然错误。
+
+评分要点（每步 1 分，共 5 分）：
+1. 从情境写出不等式 420 − 12m < 60（或等价形式）
+2. 两边减 420，得 −12m < −360
+3. 两边除以 −12 **并反转不等号**，得 m > 30 —— 写成 m < 30 此步 0 分（这正是本题要暴露的目标误解；第 1、2 步分照给）
+4. 准确指出错误：除以负数须变号（只说"算错了"不给分）
+5. 用具体数值或数量推理验证：如 m = 20 剩 180 加仑（>60）驳斥 m < 30；或 m = 31 剩 48 加仑佐证 m > 30；或用"水量单调递减"的情境推理
+
+测查的原文动词/短语：
+- "Solve word problems leading to **inequalities of the form px + q < r**, where p, q, and r are **specific rational numbers**"：本题 p = **−12**（负有理数），q = 420，r = 60。负系数逼出"除以负数要变号"——这是该句之下最典型、最高频的误解。
+- "construct simple equations and inequalities to solve problems **by reasoning about the quantities**"：第 1 步建模，以及 (b) 中用具体数量（代回检验）推翻错误结论，都是"对量进行推理"，而不是死套程序。
+
+Then a coverage mini-table:
+
+三题对原文动词/短语的覆盖：
+- Use variables to represent quantities — 题 2(a)、题 3(a)
+- construct ... by reasoning about the quantities — 题 2(a)(d)、题 3(a)(b)
+- px + q = r / p(x + q) = r, specific rational numbers — 题 1(a)(b)
+- Solve ... fluently — 题 1 整题
+- Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations — 题 1(c)
+- px + q > r — 题 2；px + q < r — 题 3
+- Graph the solution set — 题 2(c)
+- interpret it in the context — 题 2(d)（题 3 的检验也部分涉及）
+
+That's a complete, well-structured answer. Length is substantial but the user asked for a lot of detail (3 items × 4 components + original text). Format with headers and lists. Use markdown. Chinese primary language with English quotes.
+
+One thing to double-check: the standard quote — I'll reproduce from CSV. The CSV field: "4. Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities. a. Solve word problems leading to equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers. Solve equations of these forms fluently. Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach. b. Solve word problems leading to inequalities of the form px + q > r or px + q < r, where p, q, and r are specific rational numbers. Graph the solution set of the inequality and interpret it in the context of the problem."
+
+I'll quote it with the "4." kept (faithful to source). Fine.
+
+Also note: pdf page P49. ✓
+
+Let me write the final response now. I'll keep it organized with headers. No file writes needed — this is a pure Q&A response. Actually, should I write it to a file? The user didn't ask for a file; a chat response suffices.
+
+Formatting thought: use ## headers for sections, bold for key elements, blockquote for the standard. Reasonably long but necessary. Let me trim where possible — e.g., the Chinese glosses of stems can be one line each. The coverage table at the end adds value; keep compact as a list.
+
+One more sanity check on item 1(c) wording: "Mai solved equation (a) by working backwards with arithmetic: start with −3, subtract 5 to get −8, then divide by 2/3 to get −12." −8 ÷ (2/3) = −8 × 3/2 = −12 ✓.
+
+And for 1(b) — the misconception embedded: "只除 x 一项". Fine.
+
+Also, for item 2, note p=12.5 is a rational number (decimal) ✓, matches "specific rational numbers".
+
+Item 3: p = −12, q = 420, r = 60 ✓.
+
+Also for 1(a): p = 2/3, q = 5, r = −3 ✓. 1(b): p = 0.4, q = 9, r = −6 ✓.
+
+All within scope. Write the final answer.
+```
+
+</details>
+
+已从课标库中查到该条，先给原文与页码，再出题。
+
+## 课标原文
+
+**7.EE.4** · Grade 7 · 域：Expressions and Equations
+簇：Solve real-life and mathematical problems using numerical and algebraic expressions and equations.
+**PDF 页码：P49**
+
+> "4. Use variables to represent quantities in a real-world or mathematical problem, and construct simple equations and inequalities to solve problems by reasoning about the quantities. a. Solve word problems leading to equations of the form px + q = r and p(x + q) = r, where p, q, and r are specific rational numbers. Solve equations of these forms fluently. Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations used in each approach. b. Solve word problems leading to inequalities of the form px + q > r or px + q < r, where p, q, and r are specific rational numbers. Graph the solution set of the inequality and interpret it in the context of the problem."
+
+中文大意：用变量表示现实或数学问题中的量，通过推理数量关系构造简单方程/不等式来解题；a) 解实际问题导出的形如 px + q = r 与 p(x + q) = r 的方程（p、q、r 为特定有理数），要求熟练求解，并能比较代数解法与算术解法、指出每种方法所用运算的先后序列；b) 解形如 px + q > r 或 px + q < r 的不等式（p、q、r 为特定有理数），画出解集并在情境中解释其含义。
+
+---
+
+## 题目 1（直接应用）
+
+**题干**
+Solve each equation. Show every step.
+(a) (2/3)x + 5 = −3
+(b) 0.4(x + 9) = −6
+(c) Mai solved equation (a) by working backwards with arithmetic: start with −3, subtract 5 to get −8, then divide by 2/3 to get −12. In order, list the operations you used in your algebraic solution of (a), and compare your sequence with Mai's. What do you notice?
+
+（中文大意：(a)(b) 逐步解方程；(c) Mai 用算术倒推解 (a)：从 −3 出发先减 5 得 −8，再除以 2/3 得 −12。请按顺序列出你代数解的运算，与 Mai 的序列比较，写出发现。）
+
+**参考答案**
+- (a) 两边减 5：(2/3)x = −8；两边乘 3/2：x = **−12**。检验：(2/3)(−12) + 5 = −3 ✓
+- (b) 两边除以 0.4：x + 9 = −15；两边减 9：x = **−24**。（或先分配：0.4x + 3.6 = −6 → 0.4x = −9.6 → x = −24。）检验：0.4(−24 + 9) = −6 ✓
+- (c) 代数解序列：两边减 5 → 两边除以 2/3。Mai 的序列：减 5 → 除以 2/3。两条序列的运算与顺序**完全相同**；区别是算术倒推只对数值做逆运算，代数解对等式两边同时做同样的逆运算，因此对任何 px + q = r 都成立——代数解就是算术倒推的一般化。
+
+**评分要点（每步 1 分，共 6 分）**
+1. (a) 两边同减 5，得 (2/3)x = −8 —— 逆运算选对、两边同变
+2. (a) 两边同乘 3/2，得 x = −12 —— 有理数运算正确
+3. (b) 两边同除以 0.4，得 x + 9 = −15 —— 必须除"整边"；只除 x 一项（写成 0.4x + 9 = −6）此步不给分
+4. (b) 两边同减 9，得 x = −24（先分配再解同样给满）
+5. (c) 按顺序正确列出自己代数解的运算序列
+6. (c) 正确复述 Mai 的序列并作出比较：两条序列一致，能点出"代数解＝把算术倒推同时作用于两边"
+
+**测查的原文动词/短语**
+- "**Solve equations of these forms fluently**"：整题限时、不用计算器，直接考两类方程的熟练求解。
+- "equations of the form **px + q = r** and **p(x + q) = r**, where p, q, and r are **specific rational numbers**"：(a) 取 p = 2/3（分数）、(b) 取 p = 0.4（小数），两种形式各一道。
+- "Compare an algebraic solution to an arithmetic solution, **identifying the sequence of the operations used in each approach**"：(c) 要求列出并比较两种解法的运算序列。
+
+---
+
+## 题目 2（情境应用）
+
+**题干**
+Kiran is raising money for a charity walk. His goal is to raise **more than** $500. So far he has raised $165. Each additional sponsor donates $12.50.
+(a) Use a variable to represent the number of additional sponsors Kiran needs, and write an inequality that can be used to find when he reaches his goal.
+(b) Solve the inequality.
+(c) Graph the solution set on a number line.
+(d) What is the minimum whole number of additional sponsors Kiran needs? Explain how you know.
+
+（中文大意：Kiran 为慈善健走筹款，目标是"超过"500 美元；已筹 165 美元，每位新赞助人捐 12.50 美元。(a) 设变量、列不等式；(b) 求解；(c) 数轴上画解集；(d) 至少还需多少位赞助人？说明理由。）
+
+**参考答案**
+- (a) 设 s = 追加赞助人数：165 + 12.5s > 500（等价写法均可）
+- (b) 两边减 165：12.5s > 335；两边除以 12.5：**s > 26.8**
+- (c) 数轴上 26.8 处画**空心圆点**，向右画射线（26.8 不含在解集内）
+- (d) 至少 **27 位**：s 须为整数且严格大于 26.8。检验：26 位 → 165 + 325 = 490（不够）；27 位 → 165 + 337.5 = 502.5（达标）
+
+**评分要点（每步 1 分，共 5 分）**
+1. 设出变量并写出正确不等式 165 + 12.5s > 500 —— 只写方程、或不设变量，此步不给分
+2. 两边减 165，得 12.5s > 335
+3. 两边除以 12.5，得 s > 26.8 —— p 为正，不等号方向不变
+4. 数轴图：26.8 处**空心**圆点、向右 —— 画成实心、位置标成 26 或 27、方向画反，此步不给分
+5. 情境解释：至少 27 位，理由涉及"整数 + 必须超过 26.8" —— 答"26.8 位"或向下取整成 26 不给分（此步顺带暴露"机械取整"的常见误解）
+
+**测查的原文动词/短语**
+- "**Use variables to represent quantities in a real-world or mathematical problem**"：(a) 要求学生自己设变量 s。
+- "construct simple equations and inequalities to solve problems **by reasoning about the quantities**"：由"超过 500"构造严格不等式；(d) 按量的实际含义（人数为整数）推理。
+- "Solve word problems leading to **inequalities of the form px + q > r**, where p, q, and r are **specific rational numbers**"：p = 12.5，q = 165，r = 500，严格">"型。
+- "**Graph the solution set of the inequality**"：(c)。
+- "**interpret it in the context of the problem**"：(d) 把 s > 26.8 解释为"至少 27 位"。
+
+---
+
+## 题目 3（误解暴露题）
+
+**题干**
+A pool contains 420 gallons of water and is draining at a constant rate of 12 gallons per minute.
+(a) Write and solve an inequality to find after how many minutes the pool will contain less than 60 gallons.
+(b) Diego solved the problem like this：
+
+```
+420 − 12m < 60
+−12m < −360   (subtracted 420 from both sides)
+m < 30        (divided both sides by −12)
+```
+
+He concluded: "Within 30 minutes, the pool will contain less than 60 gallons."
+Identify Diego's error, and use one or more specific numbers of minutes to show why his conclusion cannot be correct.
+
+（中文大意：泳池有 420 加仑水，以每分钟 12 加仑匀速放水。(a) 写出并解不等式，求多少分钟后水量低于 60 加仑；(b) Diego 解得 m < 30 并断言"30 分钟内水量就会低于 60 加仑"。请指出他的错误，并用具体的分钟数说明该结论为何不可能成立。）
+
+**参考答案**
+- (a) 设 m = 放水分钟数：420 − 12m < 60 → −12m < −360 → **m > 30**（两边除以 −12 时不等号反转）。即 30 分钟之后水量低于 60 加仑（30 分钟整时恰为 60，不算"低于"）。
+- (b) 错误：不等式两边同除以**负数**（−12）时，不等号方向必须反转，他仍写"<"。用数值驳斥：取 m = 20（满足他的 m < 30），剩余 420 − 240 = 180 加仑，远大于 60，结论不成立；取 m = 31，剩余 420 − 372 = 48 < 60，与 m > 30 一致。也可用情境推理：水量随时间递减，前 30 分钟内不可能低于 60 加仑。
+
+**评分要点（每步 1 分，共 5 分）**
+1. 从情境写出不等式 420 − 12m < 60（或等价形式）
+2. 两边减 420，得 −12m < −360
+3. 两边除以 −12 **并反转不等号**，得 m > 30 —— 写成 m < 30 此步 0 分（目标误解；但第 1、2 步分照给，体现"只是变号处失分"）
+4. 准确指出错误：除以负数须变号 —— 只答"他算错了"不给分
+5. 用具体数值或数量推理验证：如 m = 20 时剩 180 加仑（> 60）驳斥 m < 30；或 m = 31 时剩 48 加仑佐证；或用"水量单调递减"的情境推理
+
+**测查的原文动词/短语**
+- "Solve word problems leading to **inequalities of the form px + q < r**, where p, q, and r are **specific rational numbers**"：本题 p = **−12**（负有理数）、q = 420、r = 60。负系数把"除以负数要变号"逼出来——这是该句之下最典型、最高频的误解。
+- "construct simple equations and inequalities to solve problems **by reasoning about the quantities**"：第 1 步建模，以及 (b) 中代回具体数值检验、推翻错误结论，都是"对量进行推理"而非死套程序。
+
+---
+
+## 覆盖小结
+
+| 原文动词/短语 | 对应题目 |
+|---|---|
+| Use variables to represent quantities | 题 2(a)、题 3(a) |
+| construct … by reasoning about the quantities | 题 2(a)(d)、题 3(a)(b) |
+| px + q = r / p(x + q) = r，specific rational numbers | 题 1(a)(b) |
+| Solve … fluently | 题 1 整题 |
+| Compare an algebraic solution to an arithmetic solution, identifying the sequence of the operations | 题 1(c) |
+| px + q > r | 题 2；px + q < r（负系数） | 题 3 |
+| Graph the solution set | 题 2(c) |
+| interpret it in the context | 题 2(d) |
+
+三题合起来覆盖了 7.EE.4 主句及 a、b 两个子句的全部行为动词。
+
