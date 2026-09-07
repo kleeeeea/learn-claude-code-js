@@ -301,7 +301,10 @@ def run_prompt(item: dict, c: Color, *, stream: bool, show_thinking: bool,
 	answer = "".join(answer_parts)
 	codes = sorted(set(CODE_RE.findall(answer)))
 	valid = [x for x in codes if x in KNOWN]
-	bogus = [x for x in codes if x not in KNOWN]
+	# 5.NF.4b / 6.RP.3c 这种是**子项引用**：a/b/c 子条目写在 requirement 正文里，
+	# 表里不单独成行，但父编号在表里 —— 属于正确且更细的引用，不能算臆造。
+	subitem = [x for x in codes if x not in KNOWN and x[-1].isalpha() and x[:-1] in KNOWN]
+	bogus = [x for x in codes if x not in KNOWN and x not in subitem]
 
 	result = {
 		**item,
@@ -312,6 +315,7 @@ def run_prompt(item: dict, c: Color, *, stream: bool, show_thinking: bool,
 		"thinking_chars": thinking_chars,
 		"tool_calls": tool_calls,
 		"codes_valid": valid,
+		"codes_subitem": subitem,
 		"codes_bogus": bogus,
 		"usage": usage,
 		"stop_reason": stop_reason,
@@ -415,6 +419,7 @@ def save_result(r: dict, run_dir: pathlib.Path, c: Color) -> dict:
 		"tool_calls": r["tool_calls"],
 		"tool_detail": r.get("tool_detail", []),
 		"codes_valid": r["codes_valid"],
+		"codes_subitem": r.get("codes_subitem", []),
 		"codes_bogus": r["codes_bogus"],
 		"session_id": r.get("session_id", ""),
 		"session_file": str(session_src) if session_src else "",
@@ -472,6 +477,8 @@ def verdict_line(r: dict, c: Color) -> str:
 		f"工具 {len(r['tool_calls'])} 次",
 		f"编号 {len(r['codes_valid'])} 对",
 	]
+	if r.get("codes_subitem"):
+		bits.append(f"子项 {len(r['codes_subitem'])}")
 	if r["codes_bogus"]:
 		bits.append(c.yellow(f"表外编号 {','.join(r['codes_bogus'][:3])}"))
 	if r["stop_reason"] and r["stop_reason"] != "stop":

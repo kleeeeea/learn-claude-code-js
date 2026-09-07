@@ -31,3 +31,4 @@ piagent_opencode_space/data/
 piagent_opencode_space/node_modules/
 piagent_space/sessions/
 credential
+passwords.py

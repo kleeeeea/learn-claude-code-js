@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>下游应用 · Downstream Apps — Standards Atlas</title>
+<meta name="description" content="课标图谱的五个一级应用分类与十五个二级用例，每条都带真实运行结果。">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<nav class="nav">
+	<div class="wrap nav-inner">
+		<a class="brand" href="index.html">
+			<span class="dot"></span>
+			<span>Standards Atlas</span>
+			<span class="sub">课标 · 图谱</span>
+		</a>
+		<div class="nav-links">
+			<a href="index.html#series">系列</a>
+			<a href="index.html#problem">问题</a>
+			<a href="index.html#how">方法</a>
+			<a href="explore.html">图谱</a>
+			<a href="apps.html">应用</a>
+			<a href="index.html#eval">校验</a>
+			<a href="index.html#api">接口</a>
+		</div>
+		<div class="nav-right">
+			<button class="icon-btn" id="theme-toggle" title="切换主题">◐</button>
+			<a class="btn btn-primary" href="explore.html">进入图谱</a>
+		</div>
+	</div>
+</nav>
+
+<header class="explore-head">
+	<div class="wrap">
+		<div class="eyebrow">DOWNSTREAM APPLICATION</div>
+		<h1>下游应用矩阵</h1>
+		<p>五个一级分类、十五个二级用例。点开任意一张卡片，看这条 prompt 的真实运行结果。</p>
+		<div class="pill-row" id="run-pills" style="justify-content:center"></div>
+	</div>
+</header>
+
+<div class="wrap">
+	<div class="grid grid-4" id="overview"></div>
+	<div id="cats"></div>
+
+	<section style="border:0;padding:40px 0 70px">
+		<div class="sec-eyebrow">怎么读这一页</div>
+		<h2 style="font-size:22px">分类是按输入形态切的</h2>
+		<p class="sec-lead">
+			手里是编号 → A1；是题目/教案 → A2；是学生表现 → A3；是课时预算 → A4；要产出测量工具 → A5。
+			五类互不重叠，所以一个真实需求总能落到唯一一格。每个用例的判定口径一样：
+			回答里的课标编号必须能回 <span class="mono">standards.csv</span> 核对，一个都对不上就是失败。
+		</p>
+	</section>
+</div>
+
+<dialog class="modal" id="case-modal">
+	<div class="modal-head">
+		<h3 id="m-title">—</h3>
+		<button class="icon-btn" id="m-close" style="margin-left:auto">✕</button>
+	</div>
+	<div class="modal-body" id="m-body"></div>
+</dialog>
+
+<footer>
+	<div class="wrap">
+		<div class="foot-grid">
+			<div>
+				<div class="brand" style="margin-bottom:10px"><span class="dot"></span><span>Standards Atlas</span><span class="sub">课标 · 图谱</span></div>
+				<p class="muted" style="max-width:320px;font-size:13.5px">
+					页面上的回答不是现编的，是某一次真实运行的落盘结果，连 token 用量和 session id 都在。
+				</p>
+			</div>
+			<div>
+				<h5>分类</h5>
+				<a href="#A1">A1 · 知识点阐释</a>
+				<a href="#A2">A2 · 知识点识别与对齐</a>
+				<a href="#A3">A3 · 学情诊断与补救</a>
+				<a href="#A4">A4 · 教学设计与课程规划</a>
+				<a href="#A5">A5 · 命题与评估</a>
+			</div>
+			<div>
+				<h5>数据</h5>
+				<a href="assets/data/apps.json">apps.json</a>
+				<li>来源 · custom_skill_space/result</li>
+			</div>
+			<div>
+				<h5>其它</h5>
+				<a href="index.html">首页</a>
+				<a href="explore.html">课标图谱</a>
+			</div>
+		</div>
+		<div class="foot-bottom">© 2026 Standards Atlas · 课标图谱 — 开放课标，方为教学。</div>
+	</div>
+</footer>
+
+<script src="assets/app.js"></script>
+<script src="assets/apps.js"></script>
+</body>
+</html>

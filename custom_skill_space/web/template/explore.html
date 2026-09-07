@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>课标图谱 · Explore — Standards Atlas</title>
+<meta name="description" content="检索课标条目、查看演化边、追溯前置基础与后续分支。">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<nav class="nav">
+	<div class="wrap nav-inner">
+		<a class="brand" href="index.html">
+			<span class="dot"></span>
+			<span>Standards Atlas</span>
+			<span class="sub">课标 · 图谱</span>
+		</a>
+		<div class="nav-links">
+			<a href="index.html#series">系列</a>
+			<a href="index.html#problem">问题</a>
+			<a href="index.html#how">方法</a>
+			<a href="explore.html">图谱</a>
+			<a href="apps.html">应用</a>
+			<a href="index.html#eval">校验</a>
+			<a href="index.html#api">接口</a>
+		</div>
+		<div class="nav-right">
+			<button class="icon-btn" id="theme-toggle" title="切换主题">◐</button>
+			<a class="btn btn-primary" href="apps.html">看下游应用</a>
+		</div>
+	</div>
+</nav>
+
+<header class="explore-head">
+	<div class="wrap">
+		<div class="eyebrow">课标 · 图谱</div>
+		<h1>课标演化图谱</h1>
+		<p>检索课标条目、查看演化边、追溯前置基础与后续分支。</p>
+	</div>
+</header>
+
+<div class="wrap">
+	<div class="explorer">
+		<!-- 左：检索与控件 -->
+		<aside class="panel panel-left">
+			<div class="hint" id="scope-line">加载中…</div>
+
+			<div class="field" style="margin-top:14px">
+				<label>检索</label>
+				<input class="input" id="q" type="text" placeholder="编号 / 关键词 / 领域（至少 2 个字符）…" autocomplete="off">
+				<div class="hint">默认载入 <span class="mono">8.G.7</span>（勾股定理）。支持 <span class="mono">5.NF</span> 这类前缀。</div>
+			</div>
+
+			<div class="field">
+				<label>模式</label>
+				<select class="input" id="mode">
+					<option value="neighborhood">邻域</option>
+					<option value="branch">后续分支</option>
+					<option value="ancestry">前置基础</option>
+				</select>
+			</div>
+
+			<div class="field">
+				<label>深度</label>
+				<select class="input" id="depth">
+					<option>1</option>
+					<option selected>2</option>
+					<option>3</option>
+				</select>
+			</div>
+
+			<div class="field">
+				<label>边类型</label>
+				<div class="legend" id="legend"></div>
+			</div>
+
+			<div class="field">
+				<label>检索结果</label>
+				<div class="results" id="results"></div>
+			</div>
+		</aside>
+
+		<!-- 中：图 -->
+		<div class="panel-mid">
+			<div class="graph-meta" id="graph-meta"></div>
+			<svg id="graph"></svg>
+		</div>
+
+		<!-- 右：详情 -->
+		<aside class="panel panel-right detail" id="detail"></aside>
+	</div>
+</div>
+
+<footer>
+	<div class="wrap">
+		<div class="foot-grid">
+			<div>
+				<div class="brand" style="margin-bottom:10px"><span class="dot"></span><span>Standards Atlas</span><span class="sub">课标 · 图谱</span></div>
+				<p class="muted" style="max-width:320px;font-size:13.5px">
+					节点是课标条目，边是结构推导出的演化关系——不是课标原文自带的字段。
+				</p>
+			</div>
+			<div>
+				<h5>边的含义</h5>
+				<li>progression · 同领域相邻年级</li>
+				<li>cluster · 同一 cluster 内并列</li>
+				<li>bridge · 8 年级到高中类别</li>
+			</div>
+			<div>
+				<h5>数据</h5>
+				<a href="assets/data/standards.json">standards.json</a>
+				<li>385 节点 / 1208 边</li>
+			</div>
+			<div>
+				<h5>其它</h5>
+				<a href="index.html">首页</a>
+				<a href="apps.html">下游应用</a>
+			</div>
+		</div>
+		<div class="foot-bottom">© 2026 Standards Atlas · 课标图谱 — 开放课标，方为教学。</div>
+	</div>
+</footer>
+
+<script src="assets/app.js"></script>
+<script src="assets/explore.js"></script>
+</body>
+</html>

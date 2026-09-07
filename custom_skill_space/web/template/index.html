@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>课标图谱 · Standards Atlas — 数学课标演化图谱</title>
+<meta name="description" content="把 K-12 数学课标结构化为可查询、可追溯、可调用的图谱，并驱动五类下游应用。">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<nav class="nav">
+	<div class="wrap nav-inner">
+		<a class="brand" href="index.html">
+			<span class="dot"></span>
+			<span>Standards Atlas</span>
+			<span class="sub">课标 · 图谱</span>
+		</a>
+		<div class="nav-links">
+			<a href="#series">系列</a>
+			<a href="#problem">问题</a>
+			<a href="#how">方法</a>
+			<a href="explore.html">图谱</a>
+			<a href="apps.html">应用</a>
+			<a href="#eval">校验</a>
+			<a href="#api">接口</a>
+		</div>
+		<div class="nav-right">
+			<button class="icon-btn" id="theme-toggle" title="切换主题">◐</button>
+			<a class="btn btn-primary" href="explore.html">进入图谱</a>
+		</div>
+	</div>
+</nav>
+
+<header class="hero">
+	<div class="wrap">
+		<div class="eyebrow">课标 · 图谱 / STANDARDS ATLAS</div>
+		<div class="kicker">为教学智能体而建</div>
+		<h1>数学课标演化图谱</h1>
+		<p class="lead">把 K-12 数学课程标准的纵向演化链路，结构化为可计算的图谱。</p>
+		<p class="tagline">可查询 · 可追溯 · 可回表核对</p>
+		<div class="hero-actions">
+			<a class="btn btn-primary" href="explore.html">进入图谱 →</a>
+			<a class="btn btn-ghost" href="apps.html">看下游应用</a>
+		</div>
+		<div class="hero-status">
+			<span class="pulse"></span>
+			<span>技能已上线 · math-standards</span>
+			<span>·</span>
+			<span>v0.1 · 2026</span>
+		</div>
+	</div>
+</header>
+
+<div class="wrap">
+	<div class="stats">
+		<div class="stat"><div class="num" data-count="385">0</div><div class="label">条课标</div></div>
+		<div class="stat"><div class="num" data-count="1208">0</div><div class="label">条演化边</div></div>
+		<div class="stat"><div class="num" data-count="36">0</div><div class="label">个领域</div></div>
+		<div class="stat"><div class="num" data-count="14" data-suffix="">0</div><div class="label">个年级 / 概念类别</div></div>
+	</div>
+</div>
+
+<!-- ── 系列 ───────────────────────────────────── -->
+<section id="series">
+	<div class="wrap">
+		<div class="sec-eyebrow">课标系列</div>
+		<h2>系列产品</h2>
+		<p class="sec-lead">把 385 条课标的纵向拓扑，转化为面向教师与教学智能体的六个产品。</p>
+		<div class="grid grid-3">
+			<article class="card">
+				<span class="tag tag-live">LIVE</span>
+				<div class="idx">01</div>
+				<h3>课标 · 图谱</h3>
+				<div class="en">Standards Graph</div>
+				<p>385 条课标构成的演化图谱：按编号/年级/领域检索，查看前置基础与后续分支，逐条回表核对。</p>
+			</article>
+			<article class="card">
+				<span class="tag tag-live">LIVE</span>
+				<div class="idx">02</div>
+				<h3>课标 · 技能</h3>
+				<div class="en">Standards Skill</div>
+				<p>两级加载的 agent 技能包：目录进系统提示，全量数据按需 grep，不占上下文。</p>
+			</article>
+			<article class="card">
+				<span class="tag tag-live">LIVE</span>
+				<div class="idx">03</div>
+				<h3>课标 · 应用</h3>
+				<div class="en">Downstream Apps</div>
+				<p>五个一级分类、十五个二级用例：阐释、对齐、诊断、规划、命题，每条都有真实运行记录。</p>
+			</article>
+			<article class="card">
+				<span class="tag tag-live">LIVE</span>
+				<div class="idx">04</div>
+				<h3>课标 · 校验</h3>
+				<div class="en">Grounding Check</div>
+				<p>回答里的每个编号都回表核对，臆造编号当场判定失败——幻觉在这里是可测量的。</p>
+			</article>
+			<article class="card">
+				<span class="tag tag-live">LIVE</span>
+				<div class="idx">05</div>
+				<h3>课标 · 开放数据</h3>
+				<div class="en">Open Data</div>
+				<p>standards.csv 与总览索引开放可下载，可二次构建；来源是公开的 Common Core 课标文本。</p>
+			</article>
+			<article class="card">
+				<span class="tag tag-soon">SOON</span>
+				<div class="idx">06</div>
+				<h3>课标 · 学情报告</h3>
+				<div class="en">Diagnosis Reports</div>
+				<p>由诊断链自动生成的班级/个人学情报告：薄弱编号、前置断档与可追溯证据。</p>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ── 问题 ───────────────────────────────────── -->
+<section id="problem">
+	<div class="wrap">
+		<div class="sec-eyebrow">问题</div>
+		<h2>教学智能体正在盲答</h2>
+		<p class="sec-lead">
+			每个备课/组卷/诊断工具都在临时拼凑课标知识。没人真正核对过：这条要求原文怎么写、
+			它属于哪个年级、它的前置在哪里。
+		</p>
+		<div class="grid grid-4">
+			<article class="card">
+				<h3>编号会被臆造</h3>
+				<p>模型知道课标编号长什么样，于是按规律造出 <span class="mono">5.NF.9</span> 这种并不存在的条目——形式对，内容假。</p>
+			</article>
+			<article class="card">
+				<h3>年级会被拉平</h3>
+				<p>「解一元一次方程」到底是 4 年级还是 6 年级，参数里没有清晰边界，越级教学因此发生。</p>
+			</article>
+			<article class="card">
+				<h3>没有前置拓扑</h3>
+				<p>「异分母加减依赖等值分数原理，而后者又依赖分数即单位分数之和」——这种链路没有任何地方记着。</p>
+			</article>
+			<article class="card">
+				<h3>检索停在文档</h3>
+				<p>PDF 全文检索只能定位页码，给不出「这个 domain 在相邻年级如何递进」的结构答案。</p>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ── 方法 ───────────────────────────────────── -->
+<section id="how">
+	<div class="wrap">
+		<div class="sec-eyebrow">方法</div>
+		<h2>如何构建课标图谱</h2>
+		<p class="sec-lead">一条 8 段式流水线，把一张 Excel 表淬炼成可计算的拓扑与可被 agent 调用的技能。</p>
+
+		<div class="phase">
+			<div class="phase-title">阶段一 · 图谱构建</div>
+			<div class="steps">
+				<div class="step">
+					<div class="n">01</div><h4>表格解析</h4>
+					<p>读 <span class="mono">数学课标整理表格.xlsx</span>：年级/领域/知识点/要求/编号/页码六列。</p>
+				</div>
+				<div class="step">
+					<div class="n">02</div><h4>合并单元格填充</h4>
+					<p>年级与领域只在首行有值，向下填充补齐，否则 385 条里大半会丢失归属。</p>
+				</div>
+				<div class="step">
+					<div class="n">03</div><h4>编号归一</h4>
+					<p><span class="mono">K.CC.4</span> 与 <span class="mono">S-MD.5</span> 两套编号体系统一成主键，高中五个概念类别单列。</p>
+				</div>
+				<div class="step">
+					<div class="n">04</div><h4>结构推导边</h4>
+					<p>同 cluster 串链、同 domain 相邻年级相连、8 年级桥接到高中类别——共 1208 条。</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="phase">
+			<div class="phase-title">阶段二 · 技能与校验</div>
+			<div class="steps">
+				<div class="step">
+					<div class="n">05</div><h4>两级加载</h4>
+					<p>SKILL.md 只写「怎么查」，385 条全量留在 CSV 里按需 grep，上下文不被撑爆。</p>
+				</div>
+				<div class="step">
+					<div class="n">06</div><h4>回答约定</h4>
+					<p>强制给原文、年级、领域与 PDF 页码；表里没有的直说没有，不许按规律臆造。</p>
+				</div>
+				<div class="step">
+					<div class="n">07</div><h4>自动回表核对</h4>
+					<p>抓回答里的编号逐个回 CSV 查，一个都对不上就判失败——这就是幻觉的度量。</p>
+				</div>
+				<div class="step">
+					<div class="n">08</div><h4>结果落盘</h4>
+					<p>每次运行留元数据、最终回答、完整 session history 与原始事件流，可复查可复现。</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ── 校验 ───────────────────────────────────── -->
+<section id="eval">
+	<div class="wrap">
+		<div class="sec-eyebrow">校验</div>
+		<h2>幻觉是可测量的</h2>
+		<p class="sec-lead">
+			最近一次全量运行：15 个用例全部通过。回答里出现的课标编号被逐个回表核对——
+			237 次引用、139 个去重编号，全部命中，没有一个是臆造的。
+		</p>
+		<div class="grid grid-4">
+			<div class="stat card"><div class="num">15/15</div><div class="label">用例通过</div></div>
+			<div class="stat card"><div class="num">139</div><div class="label">去重编号，全部回表命中</div></div>
+			<div class="stat card"><div class="num">0</div><div class="label">臆造编号</div></div>
+			<div class="stat card"><div class="num">72</div><div class="label">次工具调用</div></div>
+		</div>
+		<div class="pill-row">
+			<span class="pill">模型 glm-5.3</span>
+			<span class="pill">provider ark-plan</span>
+			<span class="pill">run 20260907T115228</span>
+			<span class="pill">思考 269k 字符</span>
+			<span class="pill">总耗时 1899s</span>
+		</div>
+		<p class="sec-lead" style="margin-top:18px">
+			另有 21 个形如 <span class="mono">5.NF.4b</span>、<span class="mono">6.RP.3c</span> 的
+			<b>子项引用</b>：a/b/c 子条目写在 requirement 正文里、表中不单独成行，父编号存在即为有效。
+			校验器最初把它们误判成表外编号，现已单列一类——这类误判本身也是校验口径的一部分。
+		</p>
+		<p class="sec-lead" style="margin-top:18px">
+			判据写死在脚本里：从回答正文抽出 <span class="mono">5.NF.1</span> / <span class="mono">S-MD.5</span>
+			这种形态的编号，逐个 <span class="mono">grep '^&lt;code&gt;,'</span> 回 CSV。对不上就是 FAIL，没有中间地带。
+		</p>
+	</div>
+</section>
+
+<!-- ── 接口 ───────────────────────────────────── -->
+<section id="api">
+	<div class="wrap">
+		<div class="sec-eyebrow">面向教师与智能体</div>
+		<h2>为任意教学系统注入结构化课标</h2>
+		<p class="sec-lead">技能包就是接口：agent 用 read / bash 读取，人用 grep / awk 查询，同一份数据两种消费方式。</p>
+		<div class="split">
+			<div>
+				<div class="code"><span class="c"># 按编号取一条（行首匹配最准）</span>
+<span class="k">grep</span> -m1 <span class="s">'^8.G.7,'</span> references/standards.csv
+
+<span class="c"># 某年级某领域全部条目</span>
+<span class="k">awk</span> -F<span class="s">','</span> <span class="s">'$2=="5"'</span> references/standards.csv \
+  | <span class="k">grep</span> <span class="s">',Number and Operations—Fractions,'</span>
+
+<span class="c"># 关键词反查编号</span>
+<span class="k">grep</span> -i <span class="s">'pythagorean'</span> references/standards.csv \
+  | <span class="k">cut</span> -d<span class="s">','</span> -f1,2,5</div>
+			</div>
+			<div>
+				<div class="code"><span class="c">// standards.json 的节点结构</span>
+{
+  <span class="k">"code"</span>: <span class="s">"8.G.7"</span>,
+  <span class="k">"grade"</span>: <span class="s">"8"</span>,
+  <span class="k">"domain"</span>: <span class="s">"Geometry"</span>,
+  <span class="k">"cluster"</span>: <span class="s">"Understand and apply the
+             Pythagorean Theorem."</span>,
+  <span class="k">"requirement"</span>: <span class="s">"7. Apply the Pythagorean
+     Theorem to determine unknown side
+     lengths in right triangles…"</span>,
+  <span class="k">"pdf_page"</span>: <span class="s">"P56"</span>
+}</div>
+			</div>
+		</div>
+		<div class="grid grid-3" style="margin-top:22px">
+			<article class="card">
+				<h3>给 agent 用</h3>
+				<p>把技能目录挂上去即可：<span class="mono">pi --skill custom_skill_space/math-standards</span>，名称与描述进系统提示，正文按需加载。</p>
+				<div class="pill-row"><span class="pill">SKILL.md</span><span class="pill">two-stage</span></div>
+			</article>
+			<article class="card">
+				<h3>给页面用</h3>
+				<p><span class="mono">assets/data/standards.json</span> 是本站图谱的数据源，385 节点 + 1208 边，可直接被别的前端复用。</p>
+				<div class="pill-row"><span class="pill">nodes</span><span class="pill">edges</span></div>
+			</article>
+			<article class="card">
+				<h3>给评测用</h3>
+				<p><span class="mono">apps.json</span> 保留 15 个用例的 prompt、回答、耗时、token 用量与 session id，可做回归基线。</p>
+				<div class="pill-row"><span class="pill">metadata</span><span class="pill">session</span></div>
+			</article>
+		</div>
+
+		<div class="timeline">
+			<span class="tl-item"><span class="tl-dot done"></span>技能 v0.1</span>
+			<span class="tl-sep"></span>
+			<span class="tl-item"><span class="tl-dot now"></span>图谱与应用矩阵</span>
+			<span class="tl-sep"></span>
+			<span class="tl-item"><span class="tl-dot"></span>学情报告</span>
+		</div>
+	</div>
+</section>
+
+<footer>
+	<div class="wrap">
+		<div class="foot-grid">
+			<div>
+				<div class="brand" style="margin-bottom:10px"><span class="dot"></span><span>Standards Atlas</span><span class="sub">课标 · 图谱</span></div>
+				<p class="muted" style="max-width:320px;font-size:13.5px">
+					一部为教学智能体而建的课标图谱。结构化、可查询、可回表核对。
+				</p>
+			</div>
+			<div>
+				<h5>课标系列</h5>
+				<a href="explore.html">图谱 · Standards Graph</a>
+				<a href="apps.html">应用 · Downstream Apps</a>
+				<a href="#eval">校验 · Grounding Check</a>
+				<a href="#api">接口 · Skill API</a>
+			</div>
+			<div>
+				<h5>数据</h5>
+				<a href="assets/data/standards.json">standards.json</a>
+				<a href="assets/data/apps.json">apps.json</a>
+				<li>来源 · Common Core State Standards for Mathematics</li>
+			</div>
+			<div>
+				<h5>说明</h5>
+				<li>图谱的边为结构推导</li>
+				<li>非课标原文自带关系</li>
+				<li>运行结果 · 20260907T115228</li>
+			</div>
+		</div>
+		<div class="foot-bottom">© 2026 Standards Atlas · 课标图谱 — 开放课标，方为教学。</div>
+	</div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
