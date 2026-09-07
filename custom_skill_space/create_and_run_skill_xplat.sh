@@ -9,13 +9,23 @@
 #        math-standards/references/standards.csv —— 全量数据，按需 grep，不进上下文
 #        math-standards/references/index.md   —— 年级/领域/编号前缀总览，先看这个再定位
 #      合并单元格在 xlsx 里只在首行有值，这里向下填充补齐。
-#   2. 用 piagent_space 那套（credential -> ark provider）起 pi，加 --skill 指到上面这个
-#      目录，-p 跑一条只有查表才答得出的 prompt，看 skill 是不是真被加载了。
+#   2. 起一个 agent（pi 或 opencode），把上面这个目录当 skill 挂上去，
+#      跑一条只有查表才答得出的 prompt，看 skill 是不是真被加载了。
+#
+# 跨平台（xplat）要点：
+#   - python 不写死路径：SKILL_PYTHON > mac 上的 conda > python3 > python，
+#     只用来读 xlsx（需要 openpyxl，缺了会给出安装命令）。
+#   - agent 后端可选：SKILL_AGENT=auto|pi|opencode，默认 auto——
+#     本机有 pi 就用 pi（--skill 直接指目录），否则退到 opencode
+#     （写进 opencode.json 的 skills.paths，再 opencode run）。
+#     远端 Linux 上通常只有 opencode，auto 会自己选中它。
 #
 # 用法：
-#   bash custom_skill_space/create_and_run_skill.sh              # 生成 + 测试
-#   bash custom_skill_space/create_and_run_skill.sh --build-only # 只生成，不跑模型
-#   SKILL_PROMPT='...' bash custom_skill_space/create_and_run_skill.sh   # 换测试 prompt
+#   bash custom_skill_space/create_and_run_skill_xplat.sh              # 生成 + 测试
+#   bash custom_skill_space/create_and_run_skill_xplat.sh --build-only # 只生成，不跑模型
+#   SKILL_PROMPT='...' bash custom_skill_space/create_and_run_skill_xplat.sh   # 换测试 prompt
+#   SKILL_AGENT=opencode bash custom_skill_space/create_and_run_skill_xplat.sh # 强制用 opencode
+#   SKILL_PYTHON=/path/to/python bash custom_skill_space/create_and_run_skill_xplat.sh
 #
 # 说明：变量一律写 ${VAR}（macOS 自带 bash 3.2 下 $VAR 紧跟中文标点会把首字节吃进变量名）。
 
@@ -27,13 +37,28 @@ XLSX="${SKILL_XLSX:-${SCRIPT_DIR}/source/数学课标整理表格.xlsx}"
 SKILL_NAME="math-standards"
 SKILL_DIR="${SCRIPT_DIR}/${SKILL_NAME}"
 PI_RUNNER="${REPO_DIR}/piagent_space/install_run_piagent.sh"
-PYTHON="${SKILL_PYTHON:-/Users/l/miniconda3/envs/base124/bin/python}"
+OPENCODE_RUNNER="${REPO_DIR}/piagent_opencode_space/install_run_opencode.sh"
+SKILL_AGENT="${SKILL_AGENT:-auto}"
 # 只有查表才答得出：要求给出编号对应的原文和 PDF 页码
 DEFAULT_PROMPT="用 math-standards 技能查一下课标编号 8.G.7 和 K.CC.4：分别给出课标要求原文、所属年级与领域、以及 PDF 页码。"
 SKILL_PROMPT="${SKILL_PROMPT:-${DEFAULT_PROMPT}}"
 
 say() { printf '\033[36m[skill]\033[0m %s\n' "$*"; }
 die() { printf '\033[31m[skill] %s\033[0m\n' "$*" >&2; exit 1; }
+
+# ── python：不写死路径 ─────────────────────────────
+# 显式指定 > mac 上的 conda（本机习惯）> python3 > python
+find_python() {
+	if [ -n "${SKILL_PYTHON:-}" ]; then printf '%s' "${SKILL_PYTHON}"; return; fi
+	[ -x /Users/l/miniconda3/envs/base124/bin/python ] && { printf '%s' /Users/l/miniconda3/envs/base124/bin/python; return; }
+	for cand in python3 python; do
+		command -v "${cand}" >/dev/null 2>&1 && { command -v "${cand}"; return; }
+	done
+}
+PYTHON="$(find_python)"
+[ -n "${PYTHON}" ] || die "找不到 python（试过 SKILL_PYTHON / python3 / python），用 SKILL_PYTHON=/path/to/python 指定"
+"${PYTHON}" -c 'import openpyxl' 2>/dev/null || die "${PYTHON} 缺 openpyxl，装一下：${PYTHON} -m pip install openpyxl"
+say "python：${PYTHON}"
 
 [ -f "${XLSX}" ] || die "找不到源表格：${XLSX}"
 
@@ -159,12 +184,44 @@ ls -1 "${SKILL_DIR}" "${SKILL_DIR}/references" | sed 's/^/    /'
 
 [ "${1:-}" = "--build-only" ] && { say "--build-only，跳过模型测试"; exit 0; }
 
-# ── 2. 起 pi 测试 skill 能不能被加载 ───────────────
-[ -x "${PI_RUNNER}" ] || [ -f "${PI_RUNNER}" ] || die "找不到 pi 启动脚本：${PI_RUNNER}"
-say "测试 prompt：${SKILL_PROMPT}"
-say "pi --skill ${SKILL_DIR} -p …（provider/credential 走 piagent_space 那套）"
+# ── 2. 起 agent 测试 skill 能不能被加载 ────────────
+# 本机有没有 pi 可执行文件（nvm 下可能装在别的 node 版本里，PATH 上看不见）
+have_pi() {
+	[ -n "${PIAGENT_PI:-}" ] && [ -x "${PIAGENT_PI}" ] && return 0
+	command -v pi >/dev/null 2>&1 && [ -x "$(command -v pi)" ] && return 0
+	ls -1 "${HOME}"/.nvm/versions/node/*/bin/pi >/dev/null 2>&1 && return 0
+	return 1
+}
 
-OUT="$(PIAGENT_SKIP_INSTALL=1 bash "${PI_RUNNER}" --skill "${SKILL_DIR}" -p "${SKILL_PROMPT}" 2>&1)" || true
+AGENT="${SKILL_AGENT}"
+if [ "${AGENT}" = "auto" ]; then
+	if [ -f "${PI_RUNNER}" ] && have_pi; then
+		AGENT="pi"
+	elif [ -f "${OPENCODE_RUNNER}" ]; then
+		AGENT="opencode"
+	else
+		die "既没有可用的 pi，也没有 ${OPENCODE_RUNNER}；用 SKILL_AGENT= 指定后端"
+	fi
+fi
+
+say "测试 prompt：${SKILL_PROMPT}"
+case "${AGENT}" in
+	pi)
+		[ -f "${PI_RUNNER}" ] || die "找不到 pi 启动脚本：${PI_RUNNER}"
+		say "后端 pi：--skill ${SKILL_DIR} -p …（provider/credential 走 piagent_space 那套）"
+		OUT="$(PIAGENT_SKIP_INSTALL=1 bash "${PI_RUNNER}" --skill "${SKILL_DIR}" -p "${SKILL_PROMPT}" 2>&1)" || true
+		;;
+	opencode)
+		[ -f "${OPENCODE_RUNNER}" ] || die "找不到 opencode 启动脚本：${OPENCODE_RUNNER}"
+		# opencode 没有 --skill，走配置：skills.paths 收的是「skill 根目录」，
+		# 它扫根目录下一层的 <skill>/SKILL.md，所以这里传 SKILL_DIR 的父目录。
+		say "后端 opencode：skills.paths += ${SCRIPT_DIR}，然后 opencode run …"
+		OUT="$(OPENCODE_SKILL_PATHS="${SCRIPT_DIR}" bash "${OPENCODE_RUNNER}" run "${SKILL_PROMPT}" 2>&1)" || true
+		;;
+	*)
+		die "未知后端：${AGENT}（可选 auto / pi / opencode）"
+		;;
+esac
 printf '%s\n' "${OUT}"
 
 say "验证 skill 是否真的被加载"
@@ -202,5 +259,5 @@ else
 	fi
 fi
 
-[ -n "${BAD}" ] && die "输出里缺少查表才有的内容，skill 可能没被加载（用 pi --skill ... 手动跑一次看看）"
-say "skill 加载成功"
+[ -n "${BAD}" ] && die "输出里缺少查表才有的内容，skill 可能没被加载（后端 ${AGENT}，手动跑一次看看）"
+say "skill 加载成功（后端 ${AGENT}）"

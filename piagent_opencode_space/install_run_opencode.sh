@@ -40,9 +40,54 @@ DATA_DIR="${OPENCODE_DATA_DIR:-$SCRIPT_DIR/data}"
 PROVIDER_NAME="${OPENCODE_PROVIDER:-ark-plan}"
 # opencode.json 里只放这个变量名，真实 key 由本脚本在运行时 export
 API_KEY_ENV="OPENCODE_ARK_API_KEY"
-PYTHON="${OPENCODE_PYTHON:-/Users/l/miniconda3/envs/base124/bin/python}"
+# 冒号分隔的 skill 根目录（每个根目录下面一层是 <skill>/SKILL.md），写进 opencode.json 的
+# skills.paths。留空就不动这一项。
+SKILL_PATHS="${OPENCODE_SKILL_PATHS:-}"
 
-LOCAL_BIN="$SCRIPT_DIR/node_modules/.bin/opencode"
+# python 只用来改 JSON 配置，跨机器找一个可用的：显式指定 > mac 上的 conda > python3 > python
+find_python() {
+	if [ -n "${OPENCODE_PYTHON:-}" ]; then printf '%s' "$OPENCODE_PYTHON"; return; fi
+	[ -x /Users/l/miniconda3/envs/base124/bin/python ] && { printf '%s' /Users/l/miniconda3/envs/base124/bin/python; return; }
+	for cand in python3 python; do
+		command -v "$cand" >/dev/null 2>&1 && { command -v "$cand"; return; }
+	done
+	printf '%s' python3   # 找不到就让它报错，错误信息比空串清楚
+}
+PYTHON="$(find_python)"
+
+# 本目录装出来的二进制。注意 node_modules/.bin/opencode 不一定能用：
+# 这个目录要是从别的机器同步过来的（比如 Mac -> Linux），.bin 下那个是对方平台的
+# 二进制，在这边一执行就是 Exec format error。所以按「平台包优先 + 实际跑一次
+# --version 验证」来挑，而不是只看有没有执行位。
+uname_s="$(uname -s)"; uname_m="$(uname -m)"
+case "$uname_s" in
+	Darwin) oc_plat="darwin" ;;
+	Linux)  oc_plat="linux" ;;
+	*)      oc_plat="unknown" ;;
+esac
+case "$uname_m" in
+	arm64|aarch64) oc_arch="arm64" ;;
+	x86_64|amd64)  oc_arch="x64" ;;
+	*)             oc_arch="unknown" ;;
+esac
+
+# 能跑通 --version 才算数（跨平台二进制会在这里被刷掉）
+usable_bin() { [ -n "$1" ] && [ -f "$1" ] && [ -x "$1" ] && "$1" --version >/dev/null 2>&1; }
+
+find_opencode() {
+	local c
+	for c in \
+		"${OPENCODE_BIN:-}" \
+		"$SCRIPT_DIR/node_modules/opencode-${oc_plat}-${oc_arch}/bin/opencode" \
+		"$SCRIPT_DIR/node_modules/.bin/opencode" \
+		"$(command -v opencode 2>/dev/null || true)" \
+		"$HOME/.opencode/bin/opencode"; do
+		usable_bin "$c" && { printf '%s' "$c"; return 0; }
+	done
+	return 1
+}
+
+LOCAL_BIN="$(find_opencode || true)"
 
 # ── 1. 安装 ────────────────────────────────────────
 if [ -n "${OPENCODE_SKIP_INSTALL:-}" ]; then
@@ -50,14 +95,21 @@ if [ -n "${OPENCODE_SKIP_INSTALL:-}" ]; then
 elif [ -n "${OPENCODE_GLOBAL:-}" ]; then
 	command -v opencode >/dev/null 2>&1 || npm i -g opencode-ai@latest
 	echo "[opencode] 全局安装：$(command -v opencode)"
-elif [ -x "$LOCAL_BIN" ]; then
-	echo "[opencode] 已装在本目录：$LOCAL_BIN ($("$LOCAL_BIN" --version 2>&1 | head -1))"
+elif [ -n "$LOCAL_BIN" ]; then
+	echo "[opencode] 已装：$LOCAL_BIN ($("$LOCAL_BIN" --version 2>&1 | head -1))"
 else
+	command -v npm >/dev/null 2>&1 || {
+		echo "[opencode] 没有可用的 opencode，也没有 npm。两条路：" >&2
+		echo "  1) 装 node（nvm 用户先 . ~/.nvm/nvm.sh）再重跑本脚本" >&2
+		echo "  2) 用官方独立安装器（不需要 node）：curl -fsSL https://opencode.ai/install | bash" >&2
+		exit 127
+	}
 	echo "[opencode] npm install --prefix $SCRIPT_DIR opencode-ai@latest"
 	npm install --prefix "$SCRIPT_DIR" opencode-ai@latest
+	LOCAL_BIN="$(find_opencode || true)"
 fi
 
-if [ -x "$LOCAL_BIN" ]; then
+if [ -n "$LOCAL_BIN" ]; then
 	OPENCODE=("$LOCAL_BIN")
 else
 	OPENCODE=(opencode)
@@ -97,7 +149,7 @@ if [ -n "$CRED_SOURCE" ]; then
 	else
 		# 合并而不是覆盖：只增改本 provider 和 model 这两项，别人的键留着。
 		PROVIDER_NAME="$PROVIDER_NAME" BASE_URL="$BASE_URL" MODEL_ID="$MODEL_ID" \
-		API_KEY_ENV="$API_KEY_ENV" CONFIG_FILE="$CONFIG_FILE" "$PYTHON" - <<'PYEOF'
+		API_KEY_ENV="$API_KEY_ENV" CONFIG_FILE="$CONFIG_FILE" SKILL_PATHS="$SKILL_PATHS" "$PYTHON" - <<'PYEOF'
 import json, os, pathlib
 
 path = pathlib.Path(os.environ["CONFIG_FILE"])
@@ -130,6 +182,15 @@ config.setdefault("provider", {})[name] = {
 	},
 }
 config["model"] = f"{name}/{model}"
+
+# skill 根目录：opencode 扫这些目录下的 <skill>/SKILL.md（.opencode/skills 是它的默认约定）
+skill_paths = [p for p in os.environ.get("SKILL_PATHS", "").split(":") if p]
+if skill_paths:
+	skills = config.setdefault("skills", {})
+	existing = skills.get("paths", [])
+	skills["paths"] = existing + [p for p in skill_paths if p not in existing]
+	print(f"[opencode] skills.paths -> {skills['paths']}")
+
 path.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n")
 print(f"[opencode] provider {name} -> {os.environ['BASE_URL']} ({model}) 写入 {path}")
 PYEOF
