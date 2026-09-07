@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="s08 context compact run main non interactive (tsx)" type="NodeJSConfigurationType"
+                 application-parameters=""
+                 path-to-js-file="s08_context_compact/run_main_non_interactive.ts"
+                 working-dir="$PROJECT_DIR$"
+                 node-parameters="--import tsx --env-file-if-exists=.env">
+    <method v="2" />
+  </configuration>
+</component>

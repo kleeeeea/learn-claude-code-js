@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="s14 mcp plugin (tsx)" type="NodeJSConfigurationType"
+                 application-parameters=""
+                 path-to-js-file="s14_mcp_plugin/main.ts"
+                 working-dir="$PROJECT_DIR$"
+                 node-parameters="--import tsx --env-file-if-exists=.env">
+    <method v="2" />
+  </configuration>
+</component>

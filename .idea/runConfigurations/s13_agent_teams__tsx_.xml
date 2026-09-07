@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="s13 agent teams (tsx)" type="NodeJSConfigurationType"
+                 application-parameters=""
+                 path-to-js-file="s13_agent_teams/main.ts"
+                 working-dir="$PROJECT_DIR$"
+                 node-parameters="--import tsx --env-file-if-exists=.env">
+    <method v="2" />
+  </configuration>
+</component>

@@ -6,7 +6,7 @@
   "packageManager": "pnpm@11.3.0",
   "description": "TypeScript port of learn-claude-code, built on @anthropic-ai/sdk",
   "scripts": {
-    "dev": "env -u ANTHROPIC_AUTH_TOKEN tsx --env-file-if-exists=.env",
+    "dev": "env -u ANTHROPIC_AUTH_TOKEN -u ANTHROPIC_API_KEY -u ANTHROPIC_BASE_URL tsx --env-file-if-exists=.env",
     "smoke": "env -u ANTHROPIC_AUTH_TOKEN tsx --env-file-if-exists=.env lib/smoke.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",

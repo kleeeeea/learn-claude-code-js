@@ -34,7 +34,7 @@
  *     工具输出的预览仍由循环打印（和 s02/s03 一致）
  *
  */
-
+// https://chatgpt.com/c/6a9ab838-5d6c-83ea-81f0-58d9f6225a2a
 import * as readline from "node:readline/promises";
 import type Anthropic from "@anthropic-ai/sdk";
 import { createLogger, type SessionLogger } from "../lib/logger";
@@ -138,7 +138,7 @@ export function createHooks(logger: SessionLogger): HookSystem {
     },
 
     trigger(event: HookEvent, ...args: any[]): Promise<string | null> {
-      return run(event, false, args);
+      return  run(event, false, args);
     },
 
     triggerSkippingPermission(

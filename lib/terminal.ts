@@ -1,5 +1,6 @@
 // lib/terminal.ts - 终端输出：ANSI 上色、彩色打印、可与异步输出共存的提示符
 
+import path from "node:path";
 import { clearLine, cursorTo } from "node:readline";
 
 // 全项目配色约定（各 sNN 的 print/colorize 都按这套走）：
@@ -39,9 +40,52 @@ export function colorize(text: string, color: Color): string {
   return `${ANSI[color]}${text}${RESET}`;
 }
 
+// 调用点回溯：项目里所有输出都走 print，所以 IDE console 的行号链接永远指向
+// print 里的那句 console.log，看不出是谁打的。这里从 stack 里取调用方，
+// 作为灰色前缀打在每行前面（形如 s01_agent_loop/main.ts:153）。
+// 层数由 PRINT_CALL_SITE 控制，默认开一层：
+//   PRINT_CALL_SITE=0  关掉，输出回到纯净的课程原样
+//   PRINT_CALL_SITE=3  显示最近三层，用 ← 连接，看得到完整调用链
+// 写在 .env 里对所有章节和 WebStorm run config 都生效。
+const CALL_SITE_DEPTH = Number.parseInt(process.env.PRINT_CALL_SITE ?? "", 10);
+// 没设或设了非数字都按默认的一层走。
+const CALL_SITE_DEFAULT_DEPTH = 3;
+const callSiteDepth = Number.isNaN(CALL_SITE_DEPTH)
+  ? CALL_SITE_DEFAULT_DEPTH
+  : CALL_SITE_DEPTH;
+
+// V8 stack 的一行：`    at fn (/abs/path/file.ts:12:34)` 或 `    at /abs/path/file.ts:12:34`。
+// 路径必须紧跟在 `(`、空白或行首之后，`node:internal/process/task_queues:103:5`
+// 这类 node 内部帧才不会被从中间截出一个假路径来。
+const STACK_FRAME = /(?:\(|\s|^)(?:file:\/\/)?(\/[^\s()]+):(\d+):\d+\)?$/;
+const REPO_ROOT = path.join(import.meta.dirname, "..");
+
+// 取调用方的前 depth 层，格式化成相对仓库根的 file:line（IDE 里可点）。
+// tsx 会装 source-map 支持，所以 stack 字符串里已经是 .ts 的真实行号。
+function callSite(depth: number): string {
+  // 第一行是 "Error"，从第二行开始才是帧；本文件内的帧（print / printError /
+  // printFinal）和 node_modules 都跳过，剩下的才是真正发起打印的业务代码。
+  const frames = new Error().stack?.split("\n").slice(1) ?? [];
+  const sites: string[] = [];
+  for (const frame of frames) {
+    const match = STACK_FRAME.exec(frame.trim());
+    if (!match) continue;
+    const [, file, line] = match;
+    if (file === import.meta.filename || file.includes("/node_modules/")) {
+      continue;
+    }
+    sites.push(`${path.relative(REPO_ROOT, file)}:${line}`);
+    if (sites.length >= depth) break;
+  }
+  return sites.join(" \u2190 ");
+}
+
 // console.log with an optional color.
 export function print(message = "", color?: Color): void {
-  console.log(color ? colorize(message, color) : message);
+  // 这里的代码位置永远是 lib/terminal.ts:44， 能不能把具体调用 （就是stacktrace前面几层） 位置也打出来？
+  const text = color ? colorize(message, color) : message;
+  const site = callSiteDepth > 0 ? callSite(callSiteDepth) : "";
+  console.log(site ? `${colorize(site, "gray")} ${text}` : text);
 }
 
 // readline（promises 版）接口里提示符所需的方法。

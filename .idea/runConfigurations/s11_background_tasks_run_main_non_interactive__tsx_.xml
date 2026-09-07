@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="s11 background tasks run main non interactive (tsx)" type="NodeJSConfigurationType"
+                 application-parameters=""
+                 path-to-js-file="s11_background_tasks/run_main_non_interactive.ts"
+                 working-dir="$PROJECT_DIR$"
+                 node-parameters="--import tsx --env-file-if-exists=.env">
+    <method v="2" />
+  </configuration>
+</component>

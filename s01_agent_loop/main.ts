@@ -29,13 +29,30 @@
  */
 
 import { spawnSync } from "node:child_process";
+import path from "node:path";
 import * as readline from "node:readline/promises";
 import type Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { createLogger, type SessionLogger } from "../lib/logger";
-import { createClient, MODEL_ID, type ModelClient } from "../lib/model";
+import type { ModelClient } from "../lib/model";
 import { colorize, print } from "../lib/terminal";
 import { hasToolUse, preview, printProse, textOf, zodTool } from "../lib/tools";
+
+// ── .env 自带加载 ──────────────────────────────────
+// 直接运行这份文件时先把仓库根的 .env 读进 process.env，
+// 于是 run config / pnpm dev 不必再传 --env-file-if-exists=.env。
+// loadEnvFile 与那个参数同语义：已有的环境变量优先，.env 只补空缺。
+// 顺序是关键：lib/model 的 MODEL_ID 是 import 时求值的 const，而静态 import
+// 全部先于模块体执行，所以这里用动态 import 把 lib/model 推到 .env 之后。
+// 被 main.test.ts import 时 import.meta.main 为 false，测试照旧不碰 .env。
+if (import.meta.main) {
+  try {
+    process.loadEnvFile(path.join(import.meta.dirname, "..", ".env"));
+  } catch {
+    // 没有 .env 就直接用真实环境变量，跟 -if-exists 一样不报错
+  }
+}
+const { createClient, MODEL_ID } = await import("../lib/model");
 
 const SYSTEM = `You are a coding agent at ${process.cwd()}. Use bash to solve tasks. Act, don't explain.`;
 
@@ -145,6 +162,7 @@ export async function agentLoop(
 // ── 入口 ──────────────────────────────────────────
 // import.meta.main 只在文件被直接运行时为 true。
 if (import.meta.main) {
+  // configure this based on /Users/l/other_git_repos/calculus-quest/nodejs_react_lib/learn-claude-code/credential
   const client = createClient();
   const logger = createLogger(import.meta.dirname);
   logger.config({ model: MODEL_ID, system: SYSTEM, tools });

@@ -26,3 +26,8 @@ lib/.cache/
 .worktrees/
 # s16_workflow_runtime 的运行快照、输出、journal 和锁文件目录
 .runtime/
+piagent_tau_space/sessions/
+piagent_opencode_space/data/
+piagent_opencode_space/node_modules/
+piagent_space/sessions/
+credential
