@@ -1,0 +1,10 @@
+source_id,target_id,relation_type,reason,provenance,review_status
+KP-FR-01,KP-FR-02,prerequisite,"先理解分数的意义与表示，再学习等值分数。",manual,pending-review
+KP-FR-01,KP-FR-04,prerequisite,"分数乘法建立在对分数意义的理解上。",manual,pending-review
+KP-FR-01,KP-FR-06,prerequisite,"分数除法建立在对分数意义的理解上。",manual,pending-review
+KP-FR-02,KP-FR-03,prerequisite,"异分母加减要先用等值分数完成通分。",manual,pending-review
+KP-FR-03,KP-FR-08,prerequisite,"综合应用中会用到分数加减。",manual,pending-review
+KP-FR-04,KP-FR-05,prerequisite,"先理解分数乘法，再解决相关实际问题。",manual,pending-review
+KP-FR-05,KP-FR-08,prerequisite,"综合应用中会用到分数乘法。",manual,pending-review
+KP-FR-06,KP-FR-07,prerequisite,"先理解分数除法，再解决相关实际问题。",manual,pending-review
+KP-FR-07,KP-FR-08,prerequisite,"综合应用中会用到分数除法。",manual,pending-review
