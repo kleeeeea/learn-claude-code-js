@@ -1,0 +1,9 @@
+knowledge_id,grade,domain,name,description,standard_ids,external_prerequisites,node_type
+KP-FR-01,5,Number and Operations—Fractions,分数的意义与表示,"将分数解释为分子除以分母，并解决整数除法结果表示为分数或带分数形式的问题。",5.NF.3,"整数概念；整数除法意义",core
+KP-FR-02,5,Number and Operations—Fractions,等值分数,"利用等值分数替换给定分数，将异分母分数转化为同分母分数，从而完成分数加减运算。",5.NF.1,KP-FR-01,core
+KP-FR-03,5,Number and Operations—Fractions,异分母分数加减法,"完成异分母分数（包括带分数）的加减运算，并解决涉及同一整体的分数加减应用问题。","5.NF.1;5.NF.2",KP-FR-02,core
+KP-FR-04,5,Number and Operations—Fractions,分数乘法的理解,"运用已有乘法理解，扩展到分数或整数与分数相乘；理解乘法作为缩放（扩大或缩小）的意义。","5.NF.4;5.NF.5","KP-FR-01；整数乘法意义",core
+KP-FR-05,5,Number and Operations—Fractions,分数乘法应用,"解决涉及分数和带分数乘法的实际问题。",5.NF.6,KP-FR-04,application
+KP-FR-06,5,Number and Operations—Fractions,分数除法的理解,"运用已有除法理解，拓展到单位分数除以整数以及整数除以单位分数的情况。",5.NF.7,"KP-FR-01；整数除法意义",core
+KP-FR-07,5,Number and Operations—Fractions,分数除法的应用,"解决单位分数除以非零整数以及整数除以单位分数相关的实际问题。",5.NF.7,KP-FR-06,application
+KP-FR-08,5,Number and Operations—Fractions,分数运算综合应用,"综合运用分数加减、乘法和除法知识解决实际问题。","5.NF.2;5.NF.6;5.NF.7","KP-FR-03；KP-FR-05；KP-FR-07",synthesis
